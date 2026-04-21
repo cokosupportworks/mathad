@@ -38,7 +38,7 @@
         }
     </style>
 </head>
-<body class="bg-blue-50 overflow-hidden no-select flex flex-col h-screen relative">
+<body class="bg-blue-50 overflow-hidden no-select flex flex-col h-[100dvh] relative">
 
     <!-- タイトル画面 -->
     <div id="titleScreen" class="absolute inset-0 z-50 bg-blue-50 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500">
@@ -307,6 +307,41 @@
         const yokudekimashitaSound = new Audio('yokudekimashita.mp3');
         const enterSound = new Audio('enter.mp3');
         const clickSound = new Audio('click.mp3');
+
+        // iOS等のための音声制約解除（アンロック）とバックグラウンド復帰処理
+        let audioUnlocked = false;
+        function unlockAllAudio() {
+            if (audioUnlocked) return;
+            const audios = [goalSound, yokudekimashitaSound, enterSound, clickSound];
+            audios.forEach(audio => {
+                audio.load();
+                audio.muted = true;
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        audio.muted = false;
+                    }).catch(e => {
+                        console.log("Unlock error", e);
+                        audio.muted = false;
+                    });
+                }
+            });
+            audioUnlocked = true;
+        }
+
+        // Web Audio API（効果音）がサスペンドされた場合の復帰処理
+        function resumeAudioContext() {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+        
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) resumeAudioContext();
+        });
+        document.addEventListener('touchstart', resumeAudioContext, { passive: true });
 
         // クリック音を再生する関数
         function playClick(e) {
@@ -993,6 +1028,10 @@
                 // 待機中
                 if (data.state === 'waiting') {
                     updateWaitingList(playersData);
+                    // ★ finished から waiting に戻った時に UI を待機室に戻す
+                    if (roomPreviousState === 'finished') {
+                        showModal('roomWaitingUI');
+                    }
                 }
 
                 // 待機 -> プレイ開始
@@ -1296,11 +1335,13 @@
 
         // タイトル画面を消す処理
         titleScreen.addEventListener('click', () => {
+            unlockAllAudio(); // ★ mp3音声のロック解除（スマホ対応）
+            initAudio(); // 音声エンジン（Web Audio API）の初期化
+
             // スタート音の再生
             enterSound.currentTime = 0;
             enterSound.play().catch(e => console.log("Audio play error:", e));
 
-            initAudio(); // 音声エンジン（Web Audio API）の初期化
             titleScreen.classList.add('opacity-0');
             setTimeout(() => {
                 titleScreen.classList.add('hidden');
