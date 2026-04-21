@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ますあど</title>
+    
+    <!-- アプリアイコンの設定 -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" href="apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            overscroll-behavior-y: none;
+            touch-action: none; /* スワイプ操作などを完全に無効化 */
+        }
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        /* ふわふわアニメーション */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-blue-50 overflow-hidden no-select flex flex-col h-screen relative">
+
+    <!-- タイトル画面 -->
+    <div id="titleScreen" class="absolute inset-0 z-50 bg-blue-50 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500">
+        <img src="title.png" alt="ますあど" class="w-full max-h-screen object-contain pointer-events-none">
+        <div class="absolute bottom-10 sm:bottom-16 animate-bounce text-xl sm:text-3xl font-bold text-white bg-orange-500 hover:bg-orange-600 px-8 py-4 rounded-full shadow-xl border-4 border-white transform transition active:scale-95">
+            タップしてスタート！
+        </div>
+    </div>
+
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-md p-2 sm:p-4 z-20 relative flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div class="flex items-center justify-between w-full sm:w-auto">
+            <h1 class="text-xl sm:text-2xl font-bold text-blue-600 flex items-center gap-2">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                すうじつなぎ
+            </h1>
+            
+            <!-- モード切替タブ (スマホでは右寄せ、PCではタイトル横) -->
+            <div class="flex bg-blue-100 rounded-full p-1 ml-4 shadow-inner">
+                <button id="modeSingleBtn" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full bg-white text-blue-600 shadow transition-all">ひとりで</button>
+                <button id="modeMultiBtn" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full text-blue-500 hover:text-blue-600 transition-all">だれかと</button>
+            </div>
+        </div>
+
+        <div id="controlsUI" class="flex items-center gap-3 sm:gap-6 w-full sm:w-auto justify-center sm:justify-end">
+            <!-- 歯車の設定ボタン -->
+            <button id="openSettingsBtn" class="text-slate-500 hover:text-slate-700 transition-transform transform active:scale-95 bg-slate-100 p-2.5 rounded-full shadow-sm">
+                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+            <button id="resetBtn" class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-transform transform active:scale-95 text-sm sm:text-base">
+                やりなおす
+            </button>
+        </div>
+        
+        <!-- だれかとモード用の簡易ステータス（ヘッダー右端） -->
+        <div id="multiStatusUI" class="hidden items-center gap-4 w-full sm:w-auto justify-center sm:justify-end">
+            <div class="font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full text-sm flex gap-2">
+                へや: <span id="currentRoomDisplay" class="text-blue-600">---</span>
+            </div>
+            <button id="leaveRoomBtn" class="bg-slate-400 hover:bg-slate-500 text-white font-bold py-1.5 px-3 rounded-full shadow-sm text-sm transition-transform active:scale-95">
+                やめる
+            </button>
+        </div>
+    </header>
+
+    <!-- ゲーム画面領域 -->
+    <div class="flex-grow relative overflow-hidden w-full h-full" id="canvasContainer">
+        <canvas id="gameCanvas" class="absolute inset-0 w-full h-full touch-none"></canvas>
+        <canvas id="confettiCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+
+        <!-- プレイ中の情報オーバーレイ -->
+        <div id="gameOverlayUI" class="absolute top-4 left-0 w-full px-4 pointer-events-none z-10 flex flex-col gap-2 transition-opacity duration-300 opacity-0">
+            <!-- タイマー -->
+            <div class="text-3xl sm:text-4xl font-bold text-center text-blue-800 drop-shadow-md bg-white/70 backdrop-blur-sm border-2 border-white rounded-full px-6 py-1 w-fit mx-auto shadow-lg" style="text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff;">
+                <span id="timerDisplay">0.00</span><span class="text-xl sm:text-2xl ml-1">秒</span>
+            </div>
+            <!-- マルチプレイ用進捗メーター群 -->
+            <div id="multiplayerBars" class="flex flex-col gap-1 w-full max-w-sm mx-auto hidden mt-2">
+                <!-- JSでメーターが追加される -->
+            </div>
+        </div>
+
+        <!-- 画面中央のメッセージ表示 (カウントダウン等) -->
+        <div id="centerMessage" class="absolute inset-0 flex items-center justify-center pointer-events-none z-20 hidden">
+            <span id="centerMessageText" class="text-7xl sm:text-9xl font-bold text-orange-500 drop-shadow-2xl animate-bounce" style="text-shadow: 4px 4px 0 #fff, -2px -2px 0 #fff, 4px -2px 0 #fff, -2px 4px 0 #fff;">3</span>
+        </div>
+
+        <!-- シングルプレイ用クリア画面 -->
+        <div id="singleClearOverlay" class="absolute inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center hidden z-30 transition-opacity duration-500 opacity-0">
+            <h2 class="text-5xl sm:text-7xl font-bold text-orange-500 mb-4 drop-shadow-lg text-center animate-float" style="text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff;">
+                よくできました！
+            </h2>
+            <div id="singleClearTime" class="text-3xl sm:text-4xl font-bold text-blue-600 mb-8 font-mono bg-white px-6 py-2 rounded-full border-4 border-orange-200 shadow-md">
+                タイム: 12.34秒
+            </div>
+            <button id="nextBtn" class="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-xl sm:text-3xl font-bold py-4 px-8 sm:px-12 rounded-full shadow-xl transform transition hover:scale-105 active:scale-95">
+                もういちどあそぶ
+            </button>
+        </div>
+    </div>
+
+    <!-- マルチプレイ用 モーダル群 (キャンバス上に被せる) -->
+    <div id="multiModal" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-40 hidden p-4">
+        
+        <!-- 入室フォーム -->
+        <div id="roomSetupUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md transform transition-all hidden relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-blue-400 to-purple-500"></div>
+            
+            <!-- 閉じるボタン -->
+            <button id="closeSetupBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h2 class="text-2xl font-bold text-center text-slate-800 mb-6 mt-2">だれかと あそぶ</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">へやの あいことば</label>
+                    <input type="text" id="roomWordInput" placeholder="例: りんご" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-lg focus:border-blue-500 focus:outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">きみの なまえ</label>
+                    <input type="text" id="playerNameInput" placeholder="例: たろう" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-lg focus:border-blue-500 focus:outline-none transition-colors">
+                </div>
+            </div>
+            
+            <div id="setupErrorMsg" class="text-red-500 font-bold text-sm mt-3 hidden text-center"></div>
+
+            <button id="joinRoomBtn" class="w-full mt-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 text-xl">
+                へやに はいる
+            </button>
+            <p class="text-center mt-4 text-xs text-slate-400">※同じ「あいことば」を入れたお友達と一緒に遊べます。</p>
+        </div>
+
+        <!-- 待機室 -->
+        <div id="roomWaitingUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md hidden relative">
+            
+            <!-- 閉じる（キャンセル）ボタン -->
+            <button id="cancelWaitingBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h2 class="text-2xl font-bold text-center text-slate-800 mb-2">たいきちゅう...</h2>
+            <div class="text-center text-sm font-bold text-blue-500 mb-6 bg-blue-50 py-2 rounded-lg border border-blue-100">
+                あいことば：<span id="waitingRoomWord" class="text-lg text-blue-700"></span>
+            </div>
+
+            <div class="mb-2 text-sm font-bold text-slate-600">あつまっている ひと:</div>
+            <div id="playersList" class="bg-slate-50 border border-slate-200 rounded-xl p-3 min-h-[120px] max-h-[200px] overflow-y-auto space-y-2 mb-6">
+                <!-- プレイヤーリストがここに入る -->
+            </div>
+
+            <button id="startMultiBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 text-xl animate-pulse">
+                スタート！
+            </button>
+        </div>
+
+        <!-- 結果発表 -->
+        <div id="roomResultUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md hidden relative">
+            <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-6xl">🏆</div>
+            <h2 class="text-3xl font-bold text-center text-orange-500 mb-6 mt-4">けっかはっぴょう</h2>
+
+            <div id="resultList" class="space-y-2 mb-6 max-h-[250px] overflow-y-auto pr-1">
+                <!-- 結果リストがここに入る -->
+            </div>
+
+            <button id="backToWaitingBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transform transition active:scale-95 text-lg">
+                もういちど（たいきしつへ）
+            </button>
+        </div>
+
+        <!-- 汎用メッセージ表示用 -->
+        <div id="customAlertUI" class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm hidden relative text-center">
+            <div id="customAlertMsg" class="text-xl font-bold text-slate-700 mb-6"></div>
+            <button id="closeAlertBtn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-full">とじる</button>
+        </div>
+
+        <!-- 設定画面 -->
+        <div id="settingsUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-sm hidden relative">
+            <button id="closeSettingsBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-center text-slate-800 mb-6 mt-2">せってい</h2>
+            
+            <div class="space-y-6">
+                <!-- ボールの数 -->
+                <div class="flex items-center justify-between">
+                    <label class="font-bold text-slate-700 text-lg">ボールのかず</label>
+                    <input type="number" id="ballCount" value="10" min="2" max="100" class="w-20 border-2 border-blue-200 rounded-lg px-2 py-2 text-center text-lg font-bold focus:outline-none focus:border-blue-500">
+                </div>
+                
+                <hr class="border-slate-100">
+
+                <!-- 音声読み上げトグル -->
+                <div class="flex items-center justify-between">
+                    <label class="font-bold text-slate-700 text-lg flex flex-col">
+                        <span>かずのよみあげ</span>
+                        <span class="text-xs font-normal text-slate-500">※声が出ます</span>
+                    </label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="voiceToggle" class="sr-only peer">
+                        <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-500"></div>
+                    </label>
+                </div>
+                
+                <hr class="border-slate-100">
+
+                <!-- 効果音トグル -->
+                <div class="flex items-center justify-between">
+                    <label class="font-bold text-slate-700 text-lg flex flex-col">
+                        <span>こうかおん</span>
+                        <span class="text-xs font-normal text-slate-500">※線を引くときの音</span>
+                    </label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="seToggle" class="sr-only peer" checked>
+                        <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-500"></div>
+                    </label>
+                </div>
+            </div>
+            
+            <button id="applySettingsBtn" class="w-full mt-8 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md transform transition active:scale-95 text-lg">
+                保存してとじる
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DOM Elements ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+        
+        // Settings UI
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const settingsUI = document.getElementById('settingsUI');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const applySettingsBtn = document.getElementById('applySettingsBtn');
+        const voiceToggle = document.getElementById('voiceToggle');
+        const seToggle = document.getElementById('seToggle');
+        const ballCountInput = document.getElementById('ballCount');
+
+        // Single Player UI
+        const singleClearOverlay = document.getElementById('singleClearOverlay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const gameOverlayUI = document.getElementById('gameOverlayUI');
+        
+        // Mode Tabs & Controls
+        const modeSingleBtn = document.getElementById('modeSingleBtn');
+        const modeMultiBtn = document.getElementById('modeMultiBtn');
+        const controlsUI = document.getElementById('controlsUI');
+        const multiStatusUI = document.getElementById('multiStatusUI');
+        
+        // Multi Player Modals
+        const multiModal = document.getElementById('multiModal');
+        const roomSetupUI = document.getElementById('roomSetupUI');
+        const roomWaitingUI = document.getElementById('roomWaitingUI');
+        const roomResultUI = document.getElementById('roomResultUI');
+        const customAlertUI = document.getElementById('customAlertUI');
+        const centerMessage = document.getElementById('centerMessage');
+        const titleScreen = document.getElementById('titleScreen');
+        const closeSetupBtn = document.getElementById('closeSetupBtn');
+        const cancelWaitingBtn = document.getElementById('cancelWaitingBtn');
+
+        // --- App State ---
+        let gameMode = 'single'; // 'single' | 'multi'
+        let ballsData = []; // 配置の割合データ {x, y, r, n}
+        let balls = []; // 実際の描画用データ（ピクセル）
+        let targetNumber = 1;
+        
+        let isDrawing = false;
+        let isDrawingAllowed = false; // タッチ操作を許可するか
+        let pointerPos = { x: 0, y: 0 };
+        
+        let timerInterval = null;
+        let startTime = 0;
+        let finalTime = 0;
+        let hasStartedTimer = false;
+
+        let isVoiceEnabled = false;
+        let isSoundEffectsEnabled = true;
+        let previousBallCount = 10;
+
+        // --- Audio Assets ---
+        const goalSound = new Audio('goal.mp3');
+        const yokudekimashitaSound = new Audio('yokudekimashita.mp3');
+        const enterSound = new Audio('enter.mp3');
+        const clickSound = new Audio('click.mp3');
+
+        // クリック音を再生する関数
+        function playClick(e) {
+            // プログラムからの自動クリックによる重複再生を防ぐ
+            if (e && e.type === 'click' && !e.isTrusted) return;
+            clickSound.currentTime = 0;
+            clickSound.play().catch(err => console.log("Audio play error:", err));
+        }
+
+        // --- Voice Setup ---
+        // 音声リストをあらかじめロードしておく
+        if (window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+
+        function speakNumber(num) {
+            if (!isVoiceEnabled || !window.speechSynthesis) return;
+            
+            window.speechSynthesis.cancel(); // 連続で触れた時に前の音声を即キャンセルして間髪入れずに再生
+            
+            const ut = new SpeechSynthesisUtterance(num.toString());
+            ut.lang = 'ja-JP';
+            ut.rate = 1.3;  // 少し早め
+            ut.pitch = 1.6; // 高めでかわいい女の子をイメージした声
+            
+            // 日本語の女性っぽい声を探してセット
+            const voices = window.speechSynthesis.getVoices();
+            let voice = voices.find(v => v.lang.includes('ja') && (v.name.includes('Female') || v.name.includes('Kyoko') || v.name.includes('Google 日本語')));
+            if (voice) ut.voice = voice;
+            
+            window.speechSynthesis.speak(ut);
+        }
+
+        // --- Sound Effects Setup (Web Audio API) ---
+        let audioCtx;
+        const basePentatonic = [261.63, 293.66, 329.63, 392.00, 440.00]; // C4, D4, E4, G4, A4
+        let lastNoteIndex = -1;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function getPentatonicFreq(index) {
+            const octave = Math.floor(index / 5);
+            const note = index % 5;
+            return basePentatonic[note] * Math.pow(2, octave);
+        }
+
+        function playSparkleNote(freq) {
+            if (!audioCtx || !isSoundEffectsEnabled) return;
+            
+            const t = audioCtx.currentTime;
+            
+            // メイン音 (サイン波)
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.value = freq;
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            
+            gain1.gain.setValueAtTime(0, t);
+            gain1.gain.linearRampToValueAtTime(0.08, t + 0.02); // やさしいアタック
+            gain1.gain.exponentialRampToValueAtTime(0.001, t + 1.2); // 余韻
+            osc1.start(t);
+            osc1.stop(t + 1.2);
+
+            // キラキラ成分 (トライアングル波、1オクターブ上)
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.value = freq * 2; 
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            
+            gain2.gain.setValueAtTime(0, t);
+            gain2.gain.linearRampToValueAtTime(0.03, t + 0.02);
+            gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+            osc2.start(t);
+            osc2.stop(t + 0.8);
+        }
+
+        function updateSoundEngine() {
+            if (!isSoundEffectsEnabled || !audioCtx) return;
+
+            if (isDrawing && targetNumber > 1 && targetNumber <= balls.length) {
+                const lastBall = balls[targetNumber - 2];
+                const dx = pointerPos.x - lastBall.x;
+                const dy = pointerPos.y - lastBall.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                // 30ピクセル伸びるごとに音階を1つ進める（ハープのようなグリッサンド）
+                const noteIndex = Math.floor(dist / 30);
+                
+                if (noteIndex !== lastNoteIndex) {
+                    playSparkleNote(getPentatonicFreq(noteIndex));
+                    lastNoteIndex = noteIndex;
+                }
+            } else {
+                lastNoteIndex = -1; // 描画していない時はリセット
+            }
+        }
+
+        // --- Firebase State ---
+        let db, auth;
+        let currentUserId = null;
+        let currentRoomId = null;
+        let roomUnsubscribe = null;
+        let isFirebaseReady = false;
+        
+        // ★アプリのID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'suuji-tsunagi';
+
+        // Firebase Functions (動的インポート用)
+        let initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged;
+        let getFirestore, doc, setDoc, updateDoc, onSnapshot, getDoc, deleteField;
+
+        // --- Initialize Firebase ---
+        async function initFirebase() {
+            try {
+                // 動的インポート（環境によるSyntax Errorを回避するため）
+                const appMod = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                initializeApp = appMod.initializeApp;
+                
+                const authMod = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                getAuth = authMod.getAuth;
+                signInAnonymously = authMod.signInAnonymously;
+                signInWithCustomToken = authMod.signInWithCustomToken;
+                onAuthStateChanged = authMod.onAuthStateChanged;
+                
+                const dbMod = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                getFirestore = dbMod.getFirestore;
+                doc = dbMod.doc;
+                setDoc = dbMod.setDoc;
+                updateDoc = dbMod.updateDoc;
+                onSnapshot = dbMod.onSnapshot;
+                getDoc = dbMod.getDoc;
+                deleteField = dbMod.deleteField;
+
+                const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+                let firebaseConfig = null;
+                
+                if (configStr) {
+                    // プレビュー環境用の設定
+                    firebaseConfig = JSON.parse(configStr);
+                } else {
+                    // ★ここにFirebaseコンソールで取得した設定を直接書き込みます
+                    firebaseConfig = {
+                    apiKey: "AIzaSyBq4VstoJB-itDwsL_E4kfZmH6Pax0yXOk",
+  authDomain: "studyapp-e80a9.firebaseapp.com",
+  projectId: "studyapp-e80a9",
+  storageBucket: "studyapp-e80a9.firebasestorage.app",
+  messagingSenderId: "352785604578",
+  appId: "1:352785604578:web:276e174604b498aafe23bb"
+                    };
+                }
+
+                // 設定が未入力の場合はスキップ（エラークラッシュを防ぐ）
+                if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey === "あなたのAPIキー") {
+                    console.warn("Firebaseの設定が未入力です。「だれかと」モードは現在無効になっています。");
+                    return;
+                }
+
+                // Firebaseの初期化
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // 匿名ログインを実行
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Auth state listener
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                        isFirebaseReady = true;
+                    }
+                });
+            } catch(e) {
+                // ブラウザのセキュリティ設定やネットワーク環境によって通信がブロックされた場合のエラーハンドリング
+                console.warn("通信機能の準備ができませんでした（ネットワークエラーなど）。「だれかと」モードは現在無効になっています。", e);
+                isFirebaseReady = false;
+            }
+        }
+
+        // 起動時にFirebase初期化
+        initFirebase();
+
+        // --- ゲームコア ロジック (配置生成) ---
+
+        // 配置データを生成（割合ベース 0.0 ~ 1.0）
+        function generateBallsData(count) {
+            let data = [];
+            let baseRadiusRatio = 0.08;
+            if (count > 50) baseRadiusRatio *= 0.4;
+            else if (count > 30) baseRadiusRatio *= 0.6;
+            else if (count > 15) baseRadiusRatio *= 0.8;
+
+            // 仮想的な正方形空間(1000x1000)で配置を計算して重なりを防ぐ
+            const minRadiusRatio = 0.02; 
+            let actualRadiusRatio = Math.max(baseRadiusRatio, minRadiusRatio);
+            const marginRatio = 0.01;
+            const paddingRatio = actualRadiusRatio + marginRatio;
+
+            let placedAll = false;
+
+            while (!placedAll && actualRadiusRatio >= minRadiusRatio) {
+                data = [];
+                placedAll = true;
+
+                for (let i = 1; i <= count; i++) {
+                    let placed = false;
+                    let attempts = 0;
+
+                    while (!placed && attempts < 200) {
+                        const x = paddingRatio + Math.random() * (1 - paddingRatio * 2);
+                        const y = paddingRatio + Math.random() * (1 - paddingRatio * 2);
+                        
+                        let overlap = false;
+                        for (const ball of data) {
+                            // 正方形空間での距離計算
+                            const dx = x - ball.x;
+                            const dy = y - ball.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < actualRadiusRatio * 2 + marginRatio) {
+                                overlap = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!overlap) {
+                            data.push({ x, y, r: actualRadiusRatio, n: i });
+                            placed = true;
+                        }
+                        attempts++;
+                    }
+                    if (!placed) { placedAll = false; break; }
+                }
+                if (!placedAll) actualRadiusRatio *= 0.9;
+            }
+
+            // フォールバック
+            if (!placedAll) {
+                for (let i = data.length + 1; i <= count; i++) {
+                    const x = paddingRatio + Math.random() * (1 - paddingRatio * 2);
+                    const y = paddingRatio + Math.random() * (1 - paddingRatio * 2);
+                    data.push({ x, y, r: actualRadiusRatio, n: i });
+                }
+            }
+            return data;
+        }
+
+        // 割合データから現在の画面サイズの実ピクセルへ変換
+        function applyBallsData(data) {
+            ballsData = data;
+            const minDim = Math.min(canvas.width, canvas.height);
+            
+            // 割合を画面全体に広げる。
+            // 画面が長方形の場合は、短い辺を基準にしたサイズ（minDim）を使って円を正円に保ちつつ、
+            // x, y 座標は画面いっぱいに広げる。
+            balls = data.map(b => ({
+                x: b.x * canvas.width,
+                y: b.y * canvas.height,
+                radius: b.r * minDim,
+                number: b.n
+            }));
+        }
+
+
+        // --- タイマー処理 ---
+        function updateTimerDisplay(ms) {
+            timerDisplay.innerText = (ms / 1000).toFixed(2);
+        }
+
+        function startTimer() {
+            if (hasStartedTimer) return;
+            hasStartedTimer = true;
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                updateTimerDisplay(Date.now() - startTime);
+            }, 30); // 描画は滑らかに
+            
+            gameOverlayUI.classList.remove('opacity-0');
+            gameOverlayUI.classList.add('opacity-100');
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            if (!hasStartedTimer) return 0;
+            const elapsed = Date.now() - startTime;
+            updateTimerDisplay(elapsed);
+            return elapsed / 1000;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            hasStartedTimer = false;
+            updateTimerDisplay(0);
+            gameOverlayUI.classList.remove('opacity-100');
+            gameOverlayUI.classList.add('opacity-0');
+        }
+
+
+        // --- ゲーム進行 (シングル) ---
+        function initSingleGame() {
+            gameMode = 'single';
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+
+            const count = parseInt(ballCountInput.value, 10) || 10;
+            const data = generateBallsData(count);
+            applyBallsData(data);
+            
+            targetNumber = 1;
+            isDrawing = false;
+            isDrawingAllowed = true; // すぐに触れる
+            resetTimer();
+            
+            singleClearOverlay.classList.add('hidden');
+            singleClearOverlay.classList.remove('opacity-100');
+            singleClearOverlay.classList.add('opacity-0');
+            stopConfetti();
+
+            draw();
+        }
+
+        // --- 描画処理 ---
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (balls.length === 0) return;
+
+            // 1. 確定した線
+            if (targetNumber > 1) {
+                ctx.beginPath();
+                ctx.lineWidth = Math.max(6, balls[0].radius * 0.4);
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.moveTo(balls[0].x, balls[0].y);
+                for (let i = 1; i < targetNumber - 1; i++) {
+                    ctx.lineTo(balls[i].x, balls[i].y);
+                }
+                ctx.stroke();
+            }
+
+            // 2. ドラッグ中の線
+            if (isDrawing && targetNumber > 1 && targetNumber <= balls.length) {
+                const lastBall = balls[targetNumber - 2];
+                ctx.beginPath();
+                ctx.lineWidth = Math.max(4, balls[0].radius * 0.3);
+                ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
+                ctx.setLineDash([10, 10]);
+                ctx.lineCap = 'round';
+                ctx.moveTo(lastBall.x, lastBall.y);
+                ctx.lineTo(pointerPos.x, pointerPos.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // 3. ボールの描画
+            for (const ball of balls) {
+                const isReached = ball.number < targetNumber;
+                const isTarget = ball.number === targetNumber;
+
+                ctx.beginPath();
+                const currentRadius = isTarget ? ball.radius * 1.15 : ball.radius;
+                ctx.arc(ball.x, ball.y, currentRadius, 0, Math.PI * 2);
+
+                if (isReached) {
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.fill();
+                    ctx.strokeStyle = '#1e3a8a';
+                } else if (isTarget) {
+                    ctx.fillStyle = '#eff6ff';
+                    ctx.fill();
+                    ctx.strokeStyle = '#2563eb';
+                } else {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fill();
+                    ctx.strokeStyle = '#94a3b8';
+                }
+                ctx.lineWidth = isTarget ? 4 : 2;
+                ctx.stroke();
+
+                ctx.fillStyle = isReached ? '#ffffff' : (isTarget ? '#1d4ed8' : '#475569');
+                ctx.font = `bold ${currentRadius * 1.1}px "M PLUS Rounded 1c", sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(ball.number, ball.x, ball.y + currentRadius * 0.05); 
+            }
+        }
+
+        // --- インタラクション ---
+        function checkHit() {
+            if (targetNumber > balls.length || !isDrawingAllowed) return;
+
+            const targetBall = balls[targetNumber - 1];
+            const dx = pointerPos.x - targetBall.x;
+            const dy = pointerPos.y - targetBall.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // 当たり判定は少し甘めに
+            if (dist < targetBall.radius * 1.8) {
+                
+                // シングルプレイ時、1から2に繋がった瞬間にタイマースタート
+                if (gameMode === 'single' && targetNumber === 1) {
+                    startTimer();
+                }
+
+                // ★ 正しい数字に触れた瞬間に読み上げを実行
+                speakNumber(targetNumber);
+
+                targetNumber++;
+                
+                // マルチプレイ時は進捗をサーバーに送る
+                if (gameMode === 'multi') {
+                    sendProgressThrottled(targetNumber - 1);
+                }
+                
+                if (targetNumber > balls.length) {
+                    handleClear();
+                }
+            }
+        }
+
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX, clientY = e.clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        function handlePointerDown(e) {
+            if (!isDrawingAllowed) return;
+            isDrawing = true;
+            pointerPos = getPointerPos(e);
+            checkHit();
+            updateSoundEngine();
+            draw();
+        }
+
+        function handlePointerMove(e) {
+            if (!isDrawingAllowed) return;
+            e.preventDefault();
+            if (!isDrawing) return;
+            pointerPos = getPointerPos(e);
+            checkHit();
+            updateSoundEngine();
+            draw();
+        }
+
+        function handlePointerUp() {
+            isDrawing = false;
+            updateSoundEngine();
+            draw();
+        }
+
+        canvas.addEventListener('mousedown', handlePointerDown);
+        canvas.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerUp);
+
+        canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+        canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+        window.addEventListener('touchend', handlePointerUp);
+        window.addEventListener('touchcancel', handlePointerUp);
+
+        // --- クリア処理 ---
+        function handleClear() {
+            isDrawingAllowed = false;
+            isDrawing = false;
+            draw();
+            
+            finalTime = stopTimer();
+
+            // ゴール時の音声を無条件に再生
+            goalSound.currentTime = 0;
+            goalSound.play().catch(e => console.log("Audio play error:", e));
+            
+            yokudekimashitaSound.currentTime = 0;
+            yokudekimashitaSound.play().catch(e => console.log("Audio play error:", e));
+
+            if (gameMode === 'single') {
+                setTimeout(() => {
+                    singleClearOverlay.classList.remove('hidden');
+                    document.getElementById('singleClearTime').innerText = `タイム: ${finalTime.toFixed(2)}秒`;
+                    requestAnimationFrame(() => {
+                        singleClearOverlay.classList.remove('opacity-0');
+                        singleClearOverlay.classList.add('opacity-100');
+                    });
+                    startConfetti();
+                }, 300);
+            } else if (gameMode === 'multi') {
+                // マルチプレイのクリア処理
+                sendClearTime(finalTime);
+                startConfetti();
+                
+                // 他の人が終わるのを待つため、中央にメッセージを出す
+                const msg = document.getElementById('centerMessageText');
+                msg.innerText = 'たいきちゅう...';
+                msg.className = 'text-4xl sm:text-6xl font-bold text-blue-500 drop-shadow-lg bg-white/80 px-6 py-2 rounded-full border-4 border-blue-200';
+                centerMessage.classList.remove('hidden');
+            }
+        }
+
+
+        // ==========================================
+        // マルチプレイ関連ロジック (Firebase)
+        // ==========================================
+
+        function showModal(id) {
+            multiModal.classList.remove('hidden');
+            roomSetupUI.classList.add('hidden');
+            roomWaitingUI.classList.add('hidden');
+            roomResultUI.classList.add('hidden');
+            customAlertUI.classList.add('hidden');
+            settingsUI.classList.add('hidden'); // 設定画面も一度隠す
+            if(id) document.getElementById(id).classList.remove('hidden');
+        }
+
+        function hideModal() {
+            multiModal.classList.add('hidden');
+        }
+
+        function showAlert(msg) {
+            document.getElementById('customAlertMsg').innerHTML = msg;
+            showModal('customAlertUI');
+        }
+        document.getElementById('closeAlertBtn').addEventListener('click', () => {
+            // アラートを閉じたら、元いた画面（待機室など）に戻すか閉じる
+            if(currentRoomId) showModal('roomWaitingUI');
+            else hideModal();
+        });
+
+        // 「だれかと」ボタンクリック
+        modeMultiBtn.addEventListener('click', () => {
+            if (!isFirebaseReady) {
+                alert("通信の準備ができていません。インターネットにつながっているか確認してください。");
+                return;
+            }
+            gameMode = 'multi';
+            // UI切替
+            modeSingleBtn.classList.replace('bg-white', 'text-blue-500');
+            modeSingleBtn.classList.replace('text-blue-600', 'hover:text-blue-600');
+            modeSingleBtn.classList.remove('shadow');
+            
+            modeMultiBtn.classList.replace('text-blue-500', 'bg-white');
+            modeMultiBtn.classList.replace('hover:text-blue-600', 'text-blue-600');
+            modeMultiBtn.classList.add('shadow');
+
+            controlsUI.classList.add('hidden');
+            multiStatusUI.classList.remove('hidden');
+            multiStatusUI.classList.add('flex');
+
+            resetTimer();
+            stopConfetti();
+            ctx.clearRect(0,0,canvas.width,canvas.height); // キャンバスを一旦クリア
+
+            // 入室モーダル表示
+            showModal('roomSetupUI');
+            document.getElementById('setupErrorMsg').classList.add('hidden');
+        });
+
+        // 「ひとりで」ボタンクリック
+        modeSingleBtn.addEventListener('click', () => {
+            if (roomUnsubscribe) roomUnsubscribe();
+            currentRoomId = null;
+            
+            // UI切替
+            modeMultiBtn.classList.replace('bg-white', 'text-blue-500');
+            modeMultiBtn.classList.replace('text-blue-600', 'hover:text-blue-600');
+            modeMultiBtn.classList.remove('shadow');
+            
+            modeSingleBtn.classList.replace('text-blue-500', 'bg-white');
+            modeSingleBtn.classList.replace('hover:text-blue-600', 'text-blue-600');
+            modeSingleBtn.classList.add('shadow');
+
+            controlsUI.classList.remove('hidden');
+            multiStatusUI.classList.add('hidden');
+            multiStatusUI.classList.remove('flex');
+            
+            document.getElementById('multiplayerBars').classList.add('hidden');
+            centerMessage.classList.add('hidden');
+            hideModal();
+
+            initSingleGame();
+        });
+
+        // へやにはいるボタン
+        document.getElementById('joinRoomBtn').addEventListener('click', async () => {
+            const roomId = document.getElementById('roomWordInput').value.trim();
+            const playerName = document.getElementById('playerNameInput').value.trim();
+            const errorMsg = document.getElementById('setupErrorMsg');
+            
+            if (!roomId || !playerName) {
+                errorMsg.innerText = "あいことば と なまえ を いれてね！";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // 一時的にボタンを無効化
+                const btn = document.getElementById('joinRoomBtn');
+                btn.disabled = true;
+                btn.innerText = "つうしんちゅう...";
+
+                currentRoomId = roomId;
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                const docSnap = await getDoc(roomRef);
+                
+                if (!docSnap.exists()) {
+                    // 新規部屋作成
+                    const currentCount = parseInt(ballCountInput.value, 10) || 10;
+                    await setDoc(roomRef, {
+                        state: 'waiting',
+                        ballCount: currentCount,
+                        ballLayout: [],
+                        players: {
+                            [currentUserId]: { name: playerName, progress: 0, time: null }
+                        }
+                    });
+                } else {
+                    // 既存部屋に参加
+                    const data = docSnap.data();
+                    if (data.state !== 'waiting') {
+                        btn.disabled = false;
+                        btn.innerText = "へやに はいる";
+                        errorMsg.innerText = "そのへやは もう ゲームが はじまっています！";
+                        errorMsg.classList.remove('hidden');
+                        return;
+                    }
+                    // 追加
+                    await updateDoc(roomRef, {
+                        [`players.${currentUserId}`]: { name: playerName, progress: 0, time: null }
+                    });
+                }
+
+                btn.disabled = false;
+                btn.innerText = "へやに はいる";
+                
+                document.getElementById('currentRoomDisplay').innerText = roomId;
+                document.getElementById('waitingRoomWord').innerText = roomId;
+                showModal('roomWaitingUI');
+                listenRoom();
+
+            } catch(e) {
+                console.error(e);
+                errorMsg.innerText = "エラーがおきました。もういちど ためしてね。";
+                errorMsg.classList.remove('hidden');
+                document.getElementById('joinRoomBtn').disabled = false;
+                document.getElementById('joinRoomBtn').innerText = "へやに はいる";
+            }
+        });
+
+        // Firestore Room Listener
+        let roomPreviousState = '';
+
+        function listenRoom() {
+            if (roomUnsubscribe) roomUnsubscribe();
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            
+            roomPreviousState = 'waiting';
+            
+            roomUnsubscribe = onSnapshot(roomRef, (snapshot) => {
+                if (!snapshot.exists()) return;
+                const data = snapshot.data();
+                const playersData = data.players || {};
+                
+                // 待機中
+                if (data.state === 'waiting') {
+                    updateWaitingList(playersData);
+                }
+
+                // 待機 -> プレイ開始
+                if (roomPreviousState === 'waiting' && data.state === 'playing') {
+                    hideModal();
+                    // ホストが生成した配置データを受け取って描画準備
+                    applyBallsData(data.ballLayout);
+                    targetNumber = 1;
+                    
+                    document.getElementById('multiplayerBars').classList.remove('hidden');
+                    updateProgressBars(playersData, data.ballCount);
+                    
+                    startMultiCountdown();
+                }
+
+                // プレイ中（進捗同期）
+                if (data.state === 'playing') {
+                    updateProgressBars(playersData, data.ballCount);
+                    
+                    // 自分を含め全員のタイムが入っているかチェック
+                    const allCleared = Object.values(playersData).every(p => p.time !== null);
+                    // 自分がホスト的役割（playersキーの最初の人）ならステートをfinishedにする
+                    if (allCleared && Object.keys(playersData)[0] === currentUserId) {
+                        updateDoc(roomRef, { state: 'finished' });
+                    }
+                }
+
+                // プレイ -> 結果発表
+                if (roomPreviousState === 'playing' && data.state === 'finished') {
+                    centerMessage.classList.add('hidden');
+                    stopConfetti(); // 一旦止める
+                    showResult(playersData);
+                }
+
+                roomPreviousState = data.state;
+                
+            }, (error) => {
+                console.error("Room sync error", error);
+                showAlert("つうしんが きれました");
+            });
+        }
+
+        function updateWaitingList(players) {
+            const listDiv = document.getElementById('playersList');
+            listDiv.innerHTML = '';
+            Object.keys(players).forEach(uid => {
+                const p = players[players];
+                const div = document.createElement('div');
+                div.className = `p-2 rounded-lg font-bold flex items-center gap-2 ${uid === currentUserId ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-white text-slate-700'}`;
+                div.innerHTML = `
+                    <span class="text-xl">${uid === currentUserId ? '👤' : '🤖'}</span>
+                    ${players[uid].name} ${uid === currentUserId ? '<span class="text-xs text-blue-500">(あなた)</span>' : ''}
+                `;
+                listDiv.appendChild(div);
+            });
+        }
+
+        function updateProgressBars(players, totalBalls) {
+            const container = document.getElementById('multiplayerBars');
+            container.innerHTML = '';
+            
+            Object.keys(players).forEach(uid => {
+                const p = players[uid];
+                const percent = Math.min(100, (p.progress / totalBalls) * 100);
+                const isMe = uid === currentUserId;
+                
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2 text-sm font-bold bg-white/90 px-3 py-1.5 rounded-full shadow-sm';
+                row.innerHTML = `
+                    <span class="w-16 truncate ${isMe ? 'text-orange-600' : 'text-slate-600'}">${p.name}</span>
+                    <div class="flex-grow bg-slate-200 rounded-full h-3 overflow-hidden border border-slate-300">
+                        <div class="${isMe ? 'bg-orange-500' : 'bg-blue-500'} h-full rounded-full transition-all duration-300" style="width: ${percent}%"></div>
+                    </div>
+                    <span class="w-8 text-right text-slate-600 ${p.time !== null ? 'text-green-500' : ''}">${p.time !== null ? '👑' : p.progress}</span>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // スタートボタン（待機室）
+        document.getElementById('startMultiBtn').addEventListener('click', async () => {
+            if (!currentRoomId) return;
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            const docSnap = await getDoc(roomRef);
+            if (!docSnap.exists()) return;
+            
+            const data = docSnap.data();
+            // 全員のステータスをリセット
+            const updates = { state: 'playing' };
+            Object.keys(data.players).forEach(uid => {
+                updates[`players.${uid}.progress`] = 0;
+                updates[`players.${uid}.time`] = null;
+            });
+            
+            // 新しい配置データを生成
+            updates.ballLayout = generateBallsData(data.ballCount);
+            
+            await updateDoc(roomRef, updates);
+        });
+
+        // カウントダウン演出
+        function startMultiCountdown() {
+            isDrawingAllowed = false;
+            resetTimer(); // 0.00に戻してUI表示
+            gameOverlayUI.classList.remove('opacity-0');
+            gameOverlayUI.classList.add('opacity-100');
+            
+            // キャンバスサイズを念の為更新して描画
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            applyBallsData(ballsData); // サイズに合わせて実ピクセル化
+            draw();
+
+            const msgDiv = document.getElementById('centerMessage');
+            const msgText = document.getElementById('centerMessageText');
+            msgDiv.classList.remove('hidden');
+            
+            msgText.className = 'text-7xl sm:text-9xl font-bold text-orange-500 drop-shadow-2xl animate-bounce';
+            msgText.style.textShadow = '4px 4px 0 #fff, -2px -2px 0 #fff, 4px -2px 0 #fff, -2px 4px 0 #fff';
+
+            let count = 3;
+            msgText.innerText = count;
+
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    msgText.innerText = count;
+                } else if (count === 0) {
+                    msgText.innerText = 'スタート！';
+                    msgText.classList.remove('animate-bounce');
+                    // ちょっと大きくなるアニメなどがあれば良いが今回はそのまま
+                } else {
+                    clearInterval(interval);
+                    msgDiv.classList.add('hidden');
+                    isDrawingAllowed = true;
+                    startTimer();
+                }
+            }, 1000);
+        }
+
+        // 進捗の送信（連続送信を防ぐThrottling）
+        let progressTimeout = null;
+        let pendingProgress = -1;
+        function sendProgressThrottled(prog) {
+            pendingProgress = prog;
+            if (!progressTimeout) {
+                progressTimeout = setTimeout(async () => {
+                    progressTimeout = null;
+                    if (!currentRoomId) return;
+                    try {
+                        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+                        await updateDoc(roomRef, {
+                            [`players.${currentUserId}.progress`]: pendingProgress
+                        });
+                    } catch(e) { console.error(e); }
+                }, 400); // 400msに1回だけ送信（Firebaseの制限対策）
+            }
+        }
+
+        // クリアタイムの送信（即時）
+        async function sendClearTime(time) {
+            if (!currentRoomId) return;
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+                // 最後の進捗も確実に送る
+                await updateDoc(roomRef, {
+                    [`players.${currentUserId}.progress`]: balls.length,
+                    [`players.${currentUserId}.time`]: time
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // 結果発表
+        function showResult(players) {
+            const list = Object.values(players).sort((a, b) => {
+                if (a.time === null && b.time === null) return 0;
+                if (a.time === null) return 1;
+                if (b.time === null) return -1;
+                return a.time - b.time;
+            });
+            
+            const listDiv = document.getElementById('resultList');
+            listDiv.innerHTML = '';
+            
+            list.forEach((p, index) => {
+                const rank = index + 1;
+                const timeStr = p.time !== null ? p.time.toFixed(2) + '秒' : 'リタイア';
+                let medal = '<span class="text-xl">👏</span>';
+                let bgClass = 'bg-slate-50 border-slate-200';
+                
+                if (p.time !== null) {
+                    if (rank === 1) { medal = '<span class="text-3xl drop-shadow-md">🥇</span>'; bgClass = 'bg-yellow-50 border-yellow-300 shadow-sm'; }
+                    else if (rank === 2) { medal = '<span class="text-2xl drop-shadow-md">🥈</span>'; bgClass = 'bg-slate-100 border-slate-300'; }
+                    else if (rank === 3) { medal = '<span class="text-2xl drop-shadow-md">🥉</span>'; bgClass = 'bg-orange-50 border-orange-200'; }
+                }
+
+                const div = document.createElement('div');
+                div.className = `flex justify-between items-center p-3 sm:p-4 rounded-xl border-2 ${bgClass}`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 font-bold">
+                        <div class="w-10 text-center">${medal}</div>
+                        <span class="text-lg sm:text-xl text-slate-700">${p.name}</span>
+                    </div>
+                    <div class="font-mono font-bold text-lg sm:text-xl ${p.time !== null ? 'text-blue-600' : 'text-slate-400'}">${timeStr}</div>
+                `;
+                listDiv.appendChild(div);
+            });
+
+            startConfetti();
+            showModal('roomResultUI');
+        }
+
+        // もういちど（待機室へ戻る）
+        document.getElementById('backToWaitingBtn').addEventListener('click', async () => {
+            if (!currentRoomId) return;
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            try {
+                // 代表者がwaitingに戻す
+                const docSnap = await getDoc(roomRef);
+                if (docSnap.exists() && docSnap.data().state === 'finished') {
+                    await updateDoc(roomRef, { state: 'waiting' });
+                }
+            } catch(e) { console.error(e); }
+            // onSnapshotでwaitingを検知してUIが変わる
+        });
+
+        // へやから退出する共通処理
+        async function leaveCurrentRoom() {
+            if (currentRoomId && currentUserId && isFirebaseReady) {
+                try {
+                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+                    await updateDoc(roomRef, {
+                        // データベースのプレイヤーリストから自分を完全に削除する
+                        [`players.${currentUserId}`]: deleteField()
+                    });
+                } catch(e) {
+                    console.error("へやからの退出にしっぱいしました", e);
+                }
+            }
+        }
+
+        // やめるボタン（画面上のヘッダーにあるボタン）
+        document.getElementById('leaveRoomBtn').addEventListener('click', async () => {
+            await leaveCurrentRoom();
+            modeSingleBtn.click();
+        });
+        
+        // 待機室のキャンセルボタン（新しく追加した×ボタン）
+        cancelWaitingBtn.addEventListener('click', async () => {
+            await leaveCurrentRoom();
+            modeSingleBtn.click();
+        });
+
+
+        // ==========================================
+        // UI & イベントリスナー
+        // ==========================================
+
+        // 操作系ボタンやスイッチにクリック音を追加
+        const clickSoundElements = [
+            modeSingleBtn, modeMultiBtn, openSettingsBtn, closeSettingsBtn, applySettingsBtn,
+            document.getElementById('resetBtn'), document.getElementById('nextBtn'),
+            document.getElementById('leaveRoomBtn'), closeSetupBtn, cancelWaitingBtn,
+            document.getElementById('joinRoomBtn'), document.getElementById('startMultiBtn'),
+            document.getElementById('backToWaitingBtn'), document.getElementById('closeAlertBtn'),
+            voiceToggle, seToggle
+        ];
+        clickSoundElements.forEach(el => {
+            if (el) el.addEventListener('click', playClick);
+        });
+
+        // --- 設定画面の処理 ---
+        function closeSettings() {
+            hideModal();
+            isVoiceEnabled = voiceToggle.checked;
+            isSoundEffectsEnabled = seToggle.checked;
+            
+            // iOS等で音声を有効化するためのロック解除（無音再生）
+            if (isVoiceEnabled && window.speechSynthesis) {
+                const ut = new SpeechSynthesisUtterance("");
+                ut.volume = 0;
+                window.speechSynthesis.speak(ut);
+            }
+            
+            // ボール数が変更されていたらリセット
+            const currentCount = parseInt(ballCountInput.value, 10) || 10;
+            if (currentCount !== previousBallCount) {
+                previousBallCount = currentCount;
+                if (gameMode === 'single') initSingleGame();
+            }
+        }
+
+        openSettingsBtn.addEventListener('click', () => {
+            // 開いたときの数を記憶しておく
+            previousBallCount = parseInt(ballCountInput.value, 10) || 10;
+            showModal('settingsUI');
+        });
+
+        closeSettingsBtn.addEventListener('click', closeSettings);
+        applySettingsBtn.addEventListener('click', closeSettings);
+
+        // タイトル画面を消す処理
+        titleScreen.addEventListener('click', () => {
+            // スタート音の再生
+            enterSound.currentTime = 0;
+            enterSound.play().catch(e => console.log("Audio play error:", e));
+
+            initAudio(); // 音声エンジン（Web Audio API）の初期化
+            titleScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                titleScreen.classList.add('hidden');
+                // タイトル画面が消えた直後の画面サイズに合わせて再配置
+                initSingleGame(); 
+            }, 500);
+        });
+
+        // ポップアップを閉じるボタン
+        closeSetupBtn.addEventListener('click', () => {
+            modeSingleBtn.click(); // 「ひとりで」モードに戻る処理を呼び出して閉じる
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', initSingleGame);
+        document.getElementById('nextBtn').addEventListener('click', initSingleGame);
+        
+        ballCountInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                closeSettings();
+                ballCountInput.blur();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimer);
+            window.resizeTimer = setTimeout(() => {
+                if (gameMode === 'single') {
+                    // シングルプレイ中はリサイズで再生成してOK
+                    initSingleGame();
+                } else if (gameMode === 'multi' && ballsData.length > 0) {
+                    // マルチプレイ中は、サーバーから受け取った「割合データ」を使って画面サイズに再フィットさせるだけ。
+                    // これでデバイスの大きさが変わってもボールの相対位置が維持される！
+                    canvas.width = container.clientWidth;
+                    canvas.height = container.clientHeight;
+                    applyBallsData(ballsData);
+                    draw();
+                }
+            }, 200);
+        });
+
+        // ==========================================
+        // 紙吹雪エフェクト
+        // ==========================================
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettis = [];
+        let confettiAnimationId;
+
+        function startConfetti() {
+            confettiCanvas.width = container.clientWidth;
+            confettiCanvas.height = container.clientHeight;
+            confettis = [];
+            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d', '#42a5f5', '#66bb6a', '#ffb74d'];
+            
+            for (let i = 0; i < 150; i++) {
+                confettis.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                    w: Math.random() * 10 + 8,
+                    h: Math.random() * 10 + 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vy: Math.random() * 3 + 2,
+                    vx: Math.random() * 4 - 2,
+                    rot: Math.random() * 360,
+                    rotSpeed: Math.random() * 10 - 5
+                });
+            }
+            cancelAnimationFrame(confettiAnimationId);
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            let allFallen = true;
+            
+            for (let i = 0; i < confettis.length; i++) {
+                let p = confettis[i];
+                confettiCtx.save();
+                confettiCtx.translate(p.x + p.w/2, p.y + p.h/2);
+                confettiCtx.rotate(p.rot * Math.PI / 180);
+                confettiCtx.fillStyle = p.color;
+                confettiCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                confettiCtx.restore();
+                
+                p.y += p.vy;
+                p.x += p.vx;
+                p.rot += p.rotSpeed;
+                
+                if (p.y < confettiCanvas.height + 20) {
+                    allFallen = false;
+                }
+            }
+            if (!allFallen) {
+                confettiAnimationId = requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        function stopConfetti() {
+            cancelAnimationFrame(confettiAnimationId);
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        }
+
+        // 初期起動
+        window.onload = initSingleGame;
+
+    </script>
+</body>
+</html>
