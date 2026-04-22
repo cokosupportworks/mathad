@@ -92,14 +92,23 @@
         <canvas id="confettiCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
 
         <!-- プレイ中の情報オーバーレイ -->
-        <div id="gameOverlayUI" class="absolute top-4 left-0 w-full px-4 pointer-events-none z-10 flex flex-col gap-2 transition-opacity duration-300 opacity-0">
-            <!-- タイマー -->
-            <div class="text-3xl sm:text-4xl font-bold text-center text-blue-800 drop-shadow-md bg-white/70 backdrop-blur-sm border-2 border-white rounded-full px-6 py-1 w-fit mx-auto shadow-lg" style="text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff;">
-                <span id="timerDisplay">0.00</span><span class="text-xl sm:text-2xl ml-1">秒</span>
+        <div id="gameOverlayUI" class="absolute top-2 sm:top-4 left-0 w-full px-2 sm:px-4 pointer-events-none z-10 flex flex-row items-center justify-between gap-1 sm:gap-4 transition-opacity duration-300 opacity-0">
+            <!-- 左：タイマー -->
+            <div class="text-lg sm:text-3xl font-bold text-blue-800 drop-shadow-md bg-white/80 backdrop-blur-sm border-2 border-white rounded-full px-3 sm:px-5 py-0.5 sm:py-1 shadow-lg shrink-0 whitespace-nowrap">
+                <span id="timerDisplay">0.00</span><span class="text-xs sm:text-lg ml-1">秒</span>
             </div>
-            <!-- マルチプレイ用進捗メーター群 -->
-            <div id="multiplayerBars" class="flex flex-col gap-1 w-full max-w-sm mx-auto hidden mt-2">
-                <!-- JSでメーターが追加される -->
+            
+            <!-- 中央：順位表示（マルチプレイ用） -->
+            <div id="multiRankUI" class="hidden text-base sm:text-2xl font-bold text-orange-600 drop-shadow-md bg-white/80 backdrop-blur-sm border-2 border-orange-200 rounded-full px-3 sm:px-5 py-0.5 sm:py-1 shadow-lg shrink-0 text-center whitespace-nowrap">
+                <span id="currentRankDisplay">1</span>位<span class="text-[10px] sm:text-sm text-slate-500 ml-1 font-normal">/<span id="totalPlayersDisplay">1</span>人</span>
+            </div>
+
+            <!-- 右：マラソン方式進捗バー（マルチプレイ用） -->
+            <div id="multiplayerMarathon" class="hidden flex-grow max-w-[50%] sm:max-w-md relative h-10 sm:h-12 bg-white/80 backdrop-blur-sm border-2 border-slate-200 rounded-full shadow-inner flex items-center pr-6 pl-3 sm:pr-8 sm:pl-4 overflow-visible">
+                <!-- ゴール地点のマーク -->
+                <div class="absolute right-1 sm:right-2 text-xl sm:text-2xl z-0 opacity-80">🏁</div>
+                <!-- この中に各プレイヤーのアイコンをJSで絶対配置する -->
+                <div id="marathonTrack" class="relative w-full h-full"></div>
             </div>
         </div>
 
@@ -633,7 +642,8 @@
             const marginRatio = 0.01;
             const paddingRatio = actualRadiusRatio + marginRatio;
 
-            const topMarginRatio = 0.25;
+            // ★ UIがスリムになったため、配置禁止エリアを 25% から 20% に縮小し、ゲーム領域を広げました
+            const topMarginRatio = 0.20;
 
             let placedAll = false;
 
@@ -977,6 +987,11 @@
             stopConfetti();
             ctx.clearRect(0,0,canvas.width,canvas.height);
 
+            // ★ シングルプレイのクリア画面が出っ放しなら確実に隠す
+            singleClearOverlay.classList.add('hidden');
+            singleClearOverlay.classList.remove('opacity-100');
+            singleClearOverlay.classList.add('opacity-0');
+
             showModal('roomSetupUI');
             document.getElementById('setupErrorMsg').classList.add('hidden');
         });
@@ -997,7 +1012,10 @@
             multiStatusUI.classList.add('hidden');
             multiStatusUI.classList.remove('flex');
             
-            document.getElementById('multiplayerBars').classList.add('hidden');
+            // ★ マルチプレイ専用UIを隠す
+            document.getElementById('multiRankUI').classList.add('hidden');
+            document.getElementById('multiplayerMarathon').classList.add('hidden');
+            
             centerMessage.classList.add('hidden');
             hideModal();
 
@@ -1112,14 +1130,16 @@
                     applyBallsData(data.ballLayout);
                     targetNumber = 1;
                     
-                    document.getElementById('multiplayerBars').classList.remove('hidden');
-                    updateProgressBars(playersData, data.ballCount);
+                    // ★ マルチプレイ専用UIを表示する
+                    document.getElementById('multiRankUI').classList.remove('hidden');
+                    document.getElementById('multiplayerMarathon').classList.remove('hidden');
+                    updateMultiplayerStatus(playersData, data.ballCount);
                     
                     startMultiCountdown();
                 }
 
                 if (data.state === 'playing') {
-                    updateProgressBars(playersData, data.ballCount);
+                    updateMultiplayerStatus(playersData, data.ballCount);
                     
                     const allCleared = Object.values(playersData).every(p => p.time !== null);
                     if (allCleared && Object.keys(playersData)[0] === currentUserId) {
@@ -1156,25 +1176,61 @@
             });
         }
 
-        function updateProgressBars(players, totalBalls) {
-            const container = document.getElementById('multiplayerBars');
-            container.innerHTML = '';
+        // ★ 新しいマルチプレイUI更新関数（順位とマラソンバーの更新）
+        function updateMultiplayerStatus(players, totalBalls) {
+            // --- 1. 順位の計算 ---
+            const list = Object.entries(players).map(([uid, p]) => ({ uid, ...p })).sort((a, b) => {
+                if (a.time !== null && b.time !== null) return a.time - b.time;
+                if (a.time !== null) return -1;
+                if (b.time !== null) return 1;
+                return b.progress - a.progress;
+            });
+
+            const totalPlayers = list.length;
+            let myRank = 1;
+            for (let i = 0; i < list.length; i++) {
+                if (list[i].uid === currentUserId) {
+                    myRank = i + 1;
+                    break;
+                }
+            }
+
+            document.getElementById('currentRankDisplay').innerText = myRank;
+            document.getElementById('totalPlayersDisplay').innerText = totalPlayers;
+
+            // --- 2. マラソンバーの更新 ---
+            const track = document.getElementById('marathonTrack');
+            track.innerHTML = '';
             
             Object.keys(players).forEach(uid => {
                 const p = players[uid];
                 const percent = Math.min(100, (p.progress / totalBalls) * 100);
                 const isMe = uid === currentUserId;
+                const initial = p.name ? p.name.charAt(0) : '?';
                 
-                const row = document.createElement('div');
-                row.className = 'flex items-center gap-2 text-sm font-bold bg-white/90 px-3 py-1.5 rounded-full shadow-sm';
-                row.innerHTML = `
-                    <span class="w-16 truncate ${isMe ? 'text-orange-600' : 'text-slate-600'}">${p.name}</span>
-                    <div class="flex-grow bg-slate-200 rounded-full h-3 overflow-hidden border border-slate-300">
-                        <div class="${isMe ? 'bg-orange-500' : 'bg-blue-500'} h-full rounded-full transition-all duration-300" style="width: ${percent}%"></div>
-                    </div>
-                    <span class="w-8 text-right text-slate-600 ${p.time !== null ? 'text-green-500' : ''}">${p.time !== null ? '👑' : p.progress}</span>
-                `;
-                container.appendChild(row);
+                const icon = document.createElement('div');
+                // アイコンを % の位置に絶対配置
+                icon.className = `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center justify-center transition-all duration-300 ease-out ${isMe ? 'z-20' : 'z-10'}`;
+                icon.style.left = `${percent}%`;
+
+                if (isMe) {
+                    // 自分のアイコンはオレンジ色で少し大きく表示
+                    icon.innerHTML = `
+                        <div class="text-[8px] sm:text-[10px] font-bold text-orange-600 leading-none mb-0.5 bg-white/90 px-1 rounded-full drop-shadow-sm">あなた</div>
+                        <div class="w-6 h-6 sm:w-8 sm:h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-xs sm:text-sm">
+                            ${initial}
+                        </div>
+                    `;
+                } else {
+                    // 他の人のアイコンは青色で小さめに表示
+                    icon.innerHTML = `
+                        <div class="text-[7px] sm:text-[9px] font-bold text-slate-500 leading-none mb-0.5 bg-white/90 px-1 rounded-full truncate max-w-[40px] drop-shadow-sm">${p.name}</div>
+                        <div class="w-4 h-4 sm:w-6 sm:h-6 bg-blue-400 rounded-full border sm:border-2 border-white shadow flex items-center justify-center text-white font-bold text-[8px] sm:text-xs">
+                            ${initial}
+                        </div>
+                    `;
+                }
+                track.appendChild(icon);
             });
         }
 
@@ -1220,6 +1276,9 @@
             let count = 3;
             msgText.innerText = count;
             playCountdownBeep(); // ★ 3の音
+            
+            // ★ 待機中に眠ってしまった音声エンジンを叩き起こす
+            wakeupVoice();
 
             const interval = setInterval(() => {
                 count--;
@@ -1230,6 +1289,9 @@
                     msgText.innerText = 'スタート！';
                     msgText.classList.remove('animate-bounce');
                     playStartWhistle(); // ★ スタート！のホイッスル音
+                    
+                    // ★ ゲーム開始直前にもう一度確実に起こしておく
+                    wakeupVoice();
                 } else {
                     clearInterval(interval);
                     msgDiv.classList.add('hidden');
