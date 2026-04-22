@@ -38,11 +38,13 @@
         }
     </style>
 </head>
-<body class="bg-blue-50 overflow-hidden no-select flex flex-col h-[100dvh] relative">
+<!-- ★レイアウト崩れ対策: fixed inset-0 w-full h-full を指定し、画面のスクロール領域外へのはみ出しを完全に固定 -->
+<body class="bg-blue-50 overflow-hidden no-select fixed inset-0 w-full h-full flex flex-col">
 
     <!-- タイトル画面 -->
     <div id="titleScreen" class="absolute inset-0 z-50 bg-blue-50 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-500">
-        <img src="title.jpeg" alt="ますあど" class="w-full max-h-screen object-contain pointer-events-none">
+        <!-- ★タイトル画像変更 -->
+        <img src="title0.jpg" alt="ますあど" class="w-full max-h-screen object-contain pointer-events-none">
         <div class="absolute bottom-10 sm:bottom-16 animate-bounce text-xl sm:text-3xl font-bold text-white bg-orange-500 hover:bg-orange-600 px-8 py-4 rounded-full shadow-xl border-4 border-white transform transition active:scale-95">
             タップしてスタート！
         </div>
@@ -219,7 +221,6 @@
                         <span class="text-xs font-normal text-slate-500">※声が出ます</span>
                     </label>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <!-- ★ デフォルトでONにするために checked を追加 -->
                         <input type="checkbox" id="voiceToggle" class="sr-only peer" checked>
                         <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-500"></div>
                     </label>
@@ -299,30 +300,64 @@
         let finalTime = 0;
         let hasStartedTimer = false;
 
-        // ★ デフォルトONに変更
         let isVoiceEnabled = true;
         let isSoundEffectsEnabled = true;
         let previousBallCount = 10;
 
-        // --- Audio Assets ---
-        const goalSound = new Audio('goal.mp3');
-        const yokudekimashitaSound = new Audio('yokudekimashita.mp3');
-        const enterSound = new Audio('enter.mp3');
-        const clickSound = new Audio('click.mp3');
+        // ==========================================
+        // ★ロック画面対策: オーディオ処理の完全リニューアル
+        // ==========================================
+        // iOSで勝手にメディアプレイヤーが表示されるのを防ぐため、<audio>タグを廃止し、
+        // すべて Web Audio API を使ってメモリ上（バッファ）から音を鳴らす仕組みに変更しました。
 
-        // iOS等のための音声制約解除（アンロック）とバックグラウンド復帰処理
-        let audioUnlocked = false;
-        function unlockAllAudio() {
-            if (audioUnlocked) return;
-            // 無理に再生(play)させると音が漏れる環境があるため、load()による準備のみに変更
-            const audios = [goalSound, yokudekimashitaSound, clickSound];
-            audios.forEach(audio => {
-                audio.load();
-            });
-            audioUnlocked = true;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContextClass(); // 初期状態は suspended (停止中)
+        
+        const audioBuffers = {
+            goal: null,
+            yokudekimashita: null,
+            enter: null,
+            click: null,
+            win: null,
+            lose: null
+        };
+
+        // 音声ファイルのプリロード（バックグラウンドで読み込んで準備しておく）
+        async function loadAudioBuffer(url, key) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) return;
+                const arrayBuffer = await response.arrayBuffer();
+                audioCtx.decodeAudioData(arrayBuffer, (buffer) => {
+                    audioBuffers[key] = buffer;
+                }, (e) => { /* デコードエラーは無視 */ });
+            } catch (e) {
+                // プレビュー環境などでファイルが見つからない・URLが無効な場合のエラーを無視します
+                console.log(`音声ファイル (${url}) の読み込みをスキップしました。実際の公開環境で同じフォルダにファイルが配置されていれば正しく再生されます。`);
+            }
         }
 
-        // Web Audio API（効果音）がサスペンドされた場合の復帰処理
+        // アプリを開いた瞬間に裏でこっそり音声を読み込んでおく
+        loadAudioBuffer('goal.mp3', 'goal');
+        loadAudioBuffer('yokudekimashita.mp3', 'yokudekimashita');
+        loadAudioBuffer('enter.mp3', 'enter');
+        loadAudioBuffer('click.mp3', 'click');
+        loadAudioBuffer('win.mp3', 'win');
+        loadAudioBuffer('lose.mp3', 'lose');
+
+        // バッファの再生関数
+        function playBuffer(key) {
+            // ユーザーが画面に触れていれば音声を再生
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!audioBuffers[key]) return; // 読み込みが間に合っていなければ鳴らさない
+            
+            const source = audioCtx.createBufferSource();
+            source.buffer = audioBuffers[key];
+            source.connect(audioCtx.destination);
+            source.start(0);
+        }
+
+        // Web Audio APIのサスペンド復帰処理（ブラウザがスリープから戻った時など）
         function resumeAudioContext() {
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
@@ -334,16 +369,13 @@
         });
         document.addEventListener('touchstart', resumeAudioContext, { passive: true });
 
-        // クリック音を再生する関数
+        // クリック音
         function playClick(e) {
-            // プログラムからの自動クリックによる重複再生を防ぐ
             if (e && e.type === 'click' && !e.isTrusted) return;
-            clickSound.currentTime = 0;
-            clickSound.play().catch(err => console.log("Audio play error:", err));
+            playBuffer('click');
         }
 
-        // --- Voice Setup ---
-        // ★ 読み上げの遅延をなくすため、使用する声を事前にキャッシュ（記憶）しておく
+        // --- Voice Setup (音声合成) ---
         let cachedVoice = null;
         function initVoice() {
             if (!window.speechSynthesis) return;
@@ -359,35 +391,20 @@
         function speakNumber(num) {
             if (!isVoiceEnabled || !window.speechSynthesis) return;
             
-            window.speechSynthesis.cancel(); // 連続で触れた時に前の音声を即キャンセルして間髪入れずに再生
+            window.speechSynthesis.cancel();
             
             const ut = new SpeechSynthesisUtterance(num.toString());
             ut.lang = 'ja-JP';
-            ut.rate = 1.3;  // 少し早め
-            ut.pitch = 1.6; // 高めでかわいい女の子をイメージした声
+            ut.rate = 1.3;
+            ut.pitch = 1.6;
             
-            // ★ キャッシュしておいた声をすぐにセットする（毎回の検索ラグを排除）
             if (cachedVoice) ut.voice = cachedVoice;
-            
             window.speechSynthesis.speak(ut);
         }
 
-        // --- Sound Effects Setup (Web Audio API) ---
-        let audioCtx;
+        // --- Sound Effects Setup (キラキラ音) ---
         const basePentatonic = [261.63, 293.66, 329.63, 392.00, 440.00]; // C4, D4, E4, G4, A4
         let lastNoteIndex = -1;
-
-        function initAudio() {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (AudioContext) {
-                    audioCtx = new AudioContext();
-                }
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
 
         function getPentatonicFreq(index) {
             const octave = Math.floor(index / 5);
@@ -397,10 +414,10 @@
 
         function playSparkleNote(freq) {
             if (!audioCtx || !isSoundEffectsEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             
             const t = audioCtx.currentTime;
             
-            // メイン音 (サイン波)
             const osc1 = audioCtx.createOscillator();
             const gain1 = audioCtx.createGain();
             osc1.type = 'sine';
@@ -409,12 +426,12 @@
             gain1.connect(audioCtx.destination);
             
             gain1.gain.setValueAtTime(0, t);
-            gain1.gain.linearRampToValueAtTime(0.08, t + 0.02); // やさしいアタック
-            gain1.gain.exponentialRampToValueAtTime(0.001, t + 1.2); // 余韻
+            // ★ メイン音の音量を 0.08 から 0.025 に下げました
+            gain1.gain.linearRampToValueAtTime(0.025, t + 0.02);
+            gain1.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
             osc1.start(t);
             osc1.stop(t + 1.2);
 
-            // キラキラ成分 (トライアングル波、1オクターブ上)
             const osc2 = audioCtx.createOscillator();
             const gain2 = audioCtx.createGain();
             osc2.type = 'triangle';
@@ -423,10 +440,66 @@
             gain2.connect(audioCtx.destination);
             
             gain2.gain.setValueAtTime(0, t);
-            gain2.gain.linearRampToValueAtTime(0.03, t + 0.02);
+            // ★ キラキラ成分の音量を 0.03 から 0.01 に下げました
+            gain2.gain.linearRampToValueAtTime(0.01, t + 0.02);
             gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
             osc2.start(t);
             osc2.stop(t + 0.8);
+        }
+
+        // カウントダウン用のビープ音
+        function playCountdownBeep() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.value = 880; // A5 (高いラの音)
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            gain.gain.setValueAtTime(0, t);
+            gain.gain.linearRampToValueAtTime(0.1, t + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            
+            osc.start(t);
+            osc.stop(t + 0.2);
+        }
+
+        // スタート時のホイッスル音
+        function playStartWhistle() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const t = audioCtx.currentTime;
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc1.type = 'triangle';
+            osc2.type = 'triangle';
+            
+            // 周波数をわずかにずらすことで、笛特有の「うなり」を表現
+            osc1.frequency.value = 2000;
+            osc2.frequency.value = 2030;
+            
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            gain.gain.setValueAtTime(0, t);
+            gain.gain.linearRampToValueAtTime(0.1, t + 0.05);
+            gain.gain.setValueAtTime(0.1, t + 0.5);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+            
+            osc1.start(t);
+            osc2.start(t);
+            osc1.stop(t + 0.7);
+            osc2.stop(t + 0.7);
         }
 
         function updateSoundEngine() {
@@ -438,7 +511,6 @@
                 const dy = pointerPos.y - lastBall.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 
-                // 30ピクセル伸びるごとに音階を1つ進める（ハープのようなグリッサンド）
                 const noteIndex = Math.floor(dist / 30);
                 
                 if (noteIndex !== lastNoteIndex) {
@@ -446,7 +518,7 @@
                     lastNoteIndex = noteIndex;
                 }
             } else {
-                lastNoteIndex = -1; // 描画していない時はリセット
+                lastNoteIndex = -1;
             }
         }
 
@@ -457,17 +529,13 @@
         let roomUnsubscribe = null;
         let isFirebaseReady = false;
         
-        // ★アプリのID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'suuji-tsunagi';
 
-        // Firebase Functions (動的インポート用)
         let initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged;
         let getFirestore, doc, setDoc, updateDoc, onSnapshot, getDoc, deleteField;
 
-        // --- Initialize Firebase ---
         async function initFirebase() {
             try {
-                // 動的インポート（環境によるSyntax Errorを回避するため）
                 const appMod = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
                 initializeApp = appMod.initializeApp;
                 
@@ -485,46 +553,39 @@
                 onSnapshot = dbMod.onSnapshot;
                 getDoc = dbMod.getDoc;
                 deleteField = dbMod.deleteField;
-                // ★ serverTimestampを追加
                 const serverTimestamp = dbMod.serverTimestamp;
 
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
                 let firebaseConfig = null;
                 
                 if (configStr) {
-                    // プレビュー環境用の設定
                     firebaseConfig = JSON.parse(configStr);
                 } else {
-                    // ★ここにFirebaseコンソールで取得した設定を直接書き込みます
                     firebaseConfig = {
-                    apiKey: "AIzaSyBq4VstoJB-itDwsL_E4kfZmH6Pax0yXOk",
-  authDomain: "studyapp-e80a9.firebaseapp.com",
-  projectId: "studyapp-e80a9",
-  storageBucket: "studyapp-e80a9.firebasestorage.app",
-  messagingSenderId: "352785604578",
-  appId: "1:352785604578:web:276e174604b498aafe23bb"
+                        apiKey: "AIzaSyBq4VstoJB-itDwsL_E4kfZmH6Pax0yXOk",
+                        authDomain: "studyapp-e80a9.firebaseapp.com",
+                        projectId: "studyapp-e80a9",
+                        storageBucket: "studyapp-e80a9.firebasestorage.app",
+                        messagingSenderId: "352785604578",
+                        appId: "1:352785604578:web:276e174604b498aafe23bb"
                     };
                 }
 
-                // 設定が未入力の場合はスキップ（エラークラッシュを防ぐ）
                 if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey === "あなたのAPIキー") {
                     console.warn("Firebaseの設定が未入力です。「だれかと」モードは現在無効になっています。");
                     return;
                 }
 
-                // Firebaseの初期化
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // 匿名ログインを実行
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
 
-                // Auth state listener
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUserId = user.uid;
@@ -532,18 +593,14 @@
                     }
                 });
             } catch(e) {
-                // ブラウザのセキュリティ設定やネットワーク環境によって通信がブロックされた場合のエラーハンドリング
                 console.warn("通信機能の準備ができませんでした（ネットワークエラーなど）。「だれかと」モードは現在無効になっています。", e);
                 isFirebaseReady = false;
             }
         }
 
-        // 起動時にFirebase初期化
         initFirebase();
 
         // --- ゲームコア ロジック (配置生成) ---
-
-        // 配置データを生成（割合ベース 0.0 ~ 1.0）
         function generateBallsData(count) {
             let data = [];
             let baseRadiusRatio = 0.08;
@@ -551,13 +608,11 @@
             else if (count > 30) baseRadiusRatio *= 0.6;
             else if (count > 15) baseRadiusRatio *= 0.8;
 
-            // 仮想的な正方形空間(1000x1000)で配置を計算して重なりを防ぐ
             const minRadiusRatio = 0.02; 
             let actualRadiusRatio = Math.max(baseRadiusRatio, minRadiusRatio);
             const marginRatio = 0.01;
             const paddingRatio = actualRadiusRatio + marginRatio;
 
-            // ★ 上部のタイマーや進捗バーと被らないよう、上から25%のエリアは配置禁止とする
             const topMarginRatio = 0.25;
 
             let placedAll = false;
@@ -573,14 +628,12 @@
                     while (!placed && attempts < 200) {
                         const x = paddingRatio + Math.random() * (1 - paddingRatio * 2);
                         
-                        // ★ yの計算を変更: 最低でも topMarginRatio より下に配置する
                         const minY = Math.max(paddingRatio, topMarginRatio);
                         const maxY = 1 - paddingRatio;
                         const y = minY + Math.random() * (maxY - minY);
                         
                         let overlap = false;
                         for (const ball of data) {
-                            // 正方形空間での距離計算
                             const dx = x - ball.x;
                             const dy = y - ball.y;
                             const dist = Math.sqrt(dx * dx + dy * dy);
@@ -601,7 +654,6 @@
                 if (!placedAll) actualRadiusRatio *= 0.9;
             }
 
-            // フォールバック
             if (!placedAll) {
                 for (let i = data.length + 1; i <= count; i++) {
                     const x = paddingRatio + Math.random() * (1 - paddingRatio * 2);
@@ -613,14 +665,10 @@
             return data;
         }
 
-        // 割合データから現在の画面サイズの実ピクセルへ変換
         function applyBallsData(data) {
             ballsData = data;
             const minDim = Math.min(canvas.width, canvas.height);
             
-            // 割合を画面全体に広げる。
-            // 画面が長方形の場合は、短い辺を基準にしたサイズ（minDim）を使って円を正円に保ちつつ、
-            // x, y 座標は画面いっぱいに広げる。
             balls = data.map(b => ({
                 x: b.x * canvas.width,
                 y: b.y * canvas.height,
@@ -641,7 +689,7 @@
             startTime = Date.now();
             timerInterval = setInterval(() => {
                 updateTimerDisplay(Date.now() - startTime);
-            }, 30); // 描画は滑らかに
+            }, 30);
             
             gameOverlayUI.classList.remove('opacity-0');
             gameOverlayUI.classList.add('opacity-100');
@@ -676,7 +724,7 @@
             
             targetNumber = 1;
             isDrawing = false;
-            isDrawingAllowed = true; // すぐに触れる
+            isDrawingAllowed = true;
             resetTimer();
             
             singleClearOverlay.classList.add('hidden');
@@ -693,7 +741,6 @@
 
             if (balls.length === 0) return;
 
-            // 1. 確定した線
             if (targetNumber > 1) {
                 ctx.beginPath();
                 ctx.lineWidth = Math.max(6, balls[0].radius * 0.4);
@@ -707,7 +754,6 @@
                 ctx.stroke();
             }
 
-            // 2. ドラッグ中の線
             if (isDrawing && targetNumber > 1 && targetNumber <= balls.length) {
                 const lastBall = balls[targetNumber - 2];
                 ctx.beginPath();
@@ -721,7 +767,6 @@
                 ctx.setLineDash([]);
             }
 
-            // 3. ボールの描画
             for (const ball of balls) {
                 const isReached = ball.number < targetNumber;
                 const isTarget = ball.number === targetNumber;
@@ -763,20 +808,16 @@
             const dy = pointerPos.y - targetBall.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            // 当たり判定は少し甘めに
             if (dist < targetBall.radius * 1.8) {
                 
-                // シングルプレイ時、1から2に繋がった瞬間にタイマースタート
                 if (gameMode === 'single' && targetNumber === 1) {
                     startTimer();
                 }
 
-                // ★ 正しい数字に触れた瞬間に読み上げを実行
                 speakNumber(targetNumber);
 
                 targetNumber++;
                 
-                // マルチプレイ時は進捗をサーバーに送る
                 if (gameMode === 'multi') {
                     sendProgressThrottled(targetNumber - 1);
                 }
@@ -808,7 +849,7 @@
 
         function handlePointerMove(e) {
             if (!isDrawingAllowed) return;
-            e.preventDefault();
+            e.preventDefault(); // タッチ操作中のスクロールを防止
             if (!isDrawing) return;
             pointerPos = getPointerPos(e);
             checkHit();
@@ -840,11 +881,8 @@
             finalTime = stopTimer();
 
             // ゴール時の音声を無条件に再生
-            goalSound.currentTime = 0;
-            goalSound.play().catch(e => console.log("Audio play error:", e));
-            
-            yokudekimashitaSound.currentTime = 0;
-            yokudekimashitaSound.play().catch(e => console.log("Audio play error:", e));
+            playBuffer('goal');
+            playBuffer('yokudekimashita');
 
             if (gameMode === 'single') {
                 setTimeout(() => {
@@ -857,11 +895,9 @@
                     startConfetti();
                 }, 300);
             } else if (gameMode === 'multi') {
-                // マルチプレイのクリア処理
                 sendClearTime(finalTime);
                 startConfetti();
                 
-                // 他の人が終わるのを待つため、中央にメッセージを出す
                 const msg = document.getElementById('centerMessageText');
                 msg.innerText = 'たいきちゅう...';
                 msg.className = 'text-4xl sm:text-6xl font-bold text-blue-500 drop-shadow-lg bg-white/80 px-6 py-2 rounded-full border-4 border-blue-200';
@@ -869,18 +905,16 @@
             }
         }
 
-
         // ==========================================
         // マルチプレイ関連ロジック (Firebase)
         // ==========================================
-
         function showModal(id) {
             multiModal.classList.remove('hidden');
             roomSetupUI.classList.add('hidden');
             roomWaitingUI.classList.add('hidden');
             roomResultUI.classList.add('hidden');
             customAlertUI.classList.add('hidden');
-            settingsUI.classList.add('hidden'); // 設定画面も一度隠す
+            settingsUI.classList.add('hidden');
             if(id) document.getElementById(id).classList.remove('hidden');
         }
 
@@ -893,19 +927,16 @@
             showModal('customAlertUI');
         }
         document.getElementById('closeAlertBtn').addEventListener('click', () => {
-            // アラートを閉じたら、元いた画面（待機室など）に戻すか閉じる
             if(currentRoomId) showModal('roomWaitingUI');
             else hideModal();
         });
 
-        // 「だれかと」ボタンクリック
         modeMultiBtn.addEventListener('click', () => {
             if (!isFirebaseReady) {
                 alert("通信の準備ができていません。インターネットにつながっているか確認してください。");
                 return;
             }
             gameMode = 'multi';
-            // UI切替
             modeSingleBtn.classList.replace('bg-white', 'text-blue-500');
             modeSingleBtn.classList.replace('text-blue-600', 'hover:text-blue-600');
             modeSingleBtn.classList.remove('shadow');
@@ -920,19 +951,16 @@
 
             resetTimer();
             stopConfetti();
-            ctx.clearRect(0,0,canvas.width,canvas.height); // キャンバスを一旦クリア
+            ctx.clearRect(0,0,canvas.width,canvas.height);
 
-            // 入室モーダル表示
             showModal('roomSetupUI');
             document.getElementById('setupErrorMsg').classList.add('hidden');
         });
 
-        // 「ひとりで」ボタンクリック
         modeSingleBtn.addEventListener('click', () => {
             if (roomUnsubscribe) roomUnsubscribe();
             currentRoomId = null;
             
-            // UI切替
             modeMultiBtn.classList.replace('bg-white', 'text-blue-500');
             modeMultiBtn.classList.replace('text-blue-600', 'hover:text-blue-600');
             modeMultiBtn.classList.remove('shadow');
@@ -952,7 +980,6 @@
             initSingleGame();
         });
 
-        // へやにはいるボタン
         document.getElementById('joinRoomBtn').addEventListener('click', async () => {
             const roomId = document.getElementById('roomWordInput').value.trim();
             const playerName = document.getElementById('playerNameInput').value.trim();
@@ -974,17 +1001,14 @@
                 const docSnap = await getDoc(roomRef);
                 
                 const currentCount = parseInt(ballCountInput.value, 10) || 10;
-                
-                // FirestoreのserverTimestampを取得するためのダミー関数（モジュールのロード状況に依存しないように）
                 const now = new Date().getTime();
 
                 if (!docSnap.exists()) {
-                    // 新規部屋作成
                     await setDoc(roomRef, {
                         state: 'waiting',
                         ballCount: currentCount,
                         ballLayout: [],
-                        lastActivity: now, // 最後に部屋が動いた時間
+                        lastActivity: now,
                         players: {
                             [currentUserId]: { name: playerName, progress: 0, time: null }
                         }
@@ -996,14 +1020,7 @@
                     const lastAct = data.lastActivity || 0;
                     
                     const amIInRoom = !!players[currentUserId];
-
-                    // ゴースト部屋（ロック状態）の解除判定:
-                    // 1. 誰もいないのにplayingになっている場合
-                    // 2. playingだけど自分がすでにいる（リロード時など）
-                    // 3. playingだけど1分以上（60000ms）誰も操作していない場合
                     const isGhostRoom = (data.state === 'playing') && (playerCount === 0 || amIInRoom || (now - lastAct > 60000));
-
-                    // 入室可能な条件
                     const canJoin = data.state === 'waiting' || data.state === 'finished' || isGhostRoom;
 
                     if (!canJoin) {
@@ -1014,16 +1031,13 @@
                         return;
                     }
 
-                    // 既存部屋に参加
                     const updates = {
                         [`players.${currentUserId}`]: { name: playerName, progress: 0, time: null },
                         lastActivity: now
                     };
                     
-                    // 結果発表の画面で止まっていた部屋に入った場合や、ゴースト部屋だった場合は初期化する
                     if (data.state === 'finished' || isGhostRoom) {
                         updates.state = 'waiting';
-                        // 過去のプレイヤーを一掃する
                         Object.keys(players).forEach(uid => {
                             if (uid !== currentUserId) updates[`players.${uid}`] = deleteField();
                         });
@@ -1049,7 +1063,6 @@
             }
         });
 
-        // Firestore Room Listener
         let roomPreviousState = '';
 
         function listenRoom() {
@@ -1063,19 +1076,15 @@
                 const data = snapshot.data();
                 const playersData = data.players || {};
                 
-                // 待機中
                 if (data.state === 'waiting') {
                     updateWaitingList(playersData);
-                    // ★ finished から waiting に戻った時に UI を待機室に戻す
                     if (roomPreviousState === 'finished') {
                         showModal('roomWaitingUI');
                     }
                 }
 
-                // 待機 -> プレイ開始
                 if (roomPreviousState === 'waiting' && data.state === 'playing') {
                     hideModal();
-                    // ホストが生成した配置データを受け取って描画準備
                     applyBallsData(data.ballLayout);
                     targetNumber = 1;
                     
@@ -1085,22 +1094,18 @@
                     startMultiCountdown();
                 }
 
-                // プレイ中（進捗同期）
                 if (data.state === 'playing') {
                     updateProgressBars(playersData, data.ballCount);
                     
-                    // 自分を含め全員のタイムが入っているかチェック
                     const allCleared = Object.values(playersData).every(p => p.time !== null);
-                    // 自分がホスト的役割（playersキーの最初の人）ならステートをfinishedにする
                     if (allCleared && Object.keys(playersData)[0] === currentUserId) {
                         updateDoc(roomRef, { state: 'finished' });
                     }
                 }
 
-                // プレイ -> 結果発表
                 if (roomPreviousState === 'playing' && data.state === 'finished') {
                     centerMessage.classList.add('hidden');
-                    stopConfetti(); // 一旦止める
+                    stopConfetti();
                     showResult(playersData);
                 }
 
@@ -1149,7 +1154,6 @@
             });
         }
 
-        // スタートボタン（待機室）
         document.getElementById('startMultiBtn').addEventListener('click', async () => {
             if (!currentRoomId) return;
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
@@ -1157,33 +1161,29 @@
             if (!docSnap.exists()) return;
             
             const data = docSnap.data();
-            // 全員のステータスを確実にリセット
             const updates = { 
                 state: 'playing',
-                lastActivity: new Date().getTime() // 活動時間を更新
+                lastActivity: new Date().getTime()
             };
             Object.keys(data.players).forEach(uid => {
                 updates[`players.${uid}.progress`] = 0;
                 updates[`players.${uid}.time`] = null;
             });
             
-            // 新しい配置データを生成
             updates.ballLayout = generateBallsData(data.ballCount);
             
             await updateDoc(roomRef, updates);
         });
 
-        // カウントダウン演出
         function startMultiCountdown() {
             isDrawingAllowed = false;
-            resetTimer(); // 0.00に戻してUI表示
+            resetTimer();
             gameOverlayUI.classList.remove('opacity-0');
             gameOverlayUI.classList.add('opacity-100');
             
-            // キャンバスサイズを念の為更新して描画
             canvas.width = container.clientWidth;
             canvas.height = container.clientHeight;
-            applyBallsData(ballsData); // サイズに合わせて実ピクセル化
+            applyBallsData(ballsData);
             draw();
 
             const msgDiv = document.getElementById('centerMessage');
@@ -1195,15 +1195,17 @@
 
             let count = 3;
             msgText.innerText = count;
+            playCountdownBeep(); // ★ 3の音
 
             const interval = setInterval(() => {
                 count--;
                 if (count > 0) {
                     msgText.innerText = count;
+                    playCountdownBeep(); // ★ 2, 1の音
                 } else if (count === 0) {
                     msgText.innerText = 'スタート！';
                     msgText.classList.remove('animate-bounce');
-                    // ちょっと大きくなるアニメなどがあれば良いが今回はそのまま
+                    playStartWhistle(); // ★ スタート！のホイッスル音
                 } else {
                     clearInterval(interval);
                     msgDiv.classList.add('hidden');
@@ -1213,7 +1215,6 @@
             }, 1000);
         }
 
-        // 進捗の送信（連続送信を防ぐThrottling）
         let progressTimeout = null;
         let pendingProgress = -1;
         function sendProgressThrottled(prog) {
@@ -1226,14 +1227,13 @@
                         const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
                         await updateDoc(roomRef, {
                             [`players.${currentUserId}.progress`]: pendingProgress,
-                            lastActivity: new Date().getTime() // 進捗があるたびに活動時間を更新
+                            lastActivity: new Date().getTime()
                         });
                     } catch(e) { console.error(e); }
                 }, 400); 
             }
         }
 
-        // クリアタイムの送信（即時）
         async function sendClearTime(time) {
             if (!currentRoomId) return;
             try {
@@ -1246,7 +1246,6 @@
             } catch(e) { console.error(e); }
         }
 
-        // もういちど（待機室へ戻る）
         document.getElementById('backToWaitingBtn').addEventListener('click', async () => {
             if (!currentRoomId) return;
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
@@ -1254,7 +1253,6 @@
                 const docSnap = await getDoc(roomRef);
                 if (docSnap.exists() && docSnap.data().state === 'finished') {
                     const data = docSnap.data();
-                    // ★ waitingに戻すだけでなく、全員のステータスを確実にリセットする
                     const updates = { state: 'waiting', lastActivity: new Date().getTime() };
                     Object.keys(data.players).forEach(uid => {
                         updates[`players.${uid}.progress`] = 0;
@@ -1265,15 +1263,24 @@
             } catch(e) { console.error(e); }
         });
 
-        // 結果発表
         function showResult(players) {
-            const list = Object.values(players).sort((a, b) => {
+            // UIDを含めてリスト化し、タイム順にソートする
+            const list = Object.entries(players).map(([uid, p]) => ({ uid, ...p })).sort((a, b) => {
                 if (a.time === null && b.time === null) return 0;
                 if (a.time === null) return 1;
                 if (b.time === null) return -1;
                 return a.time - b.time;
             });
             
+            // ★ 勝敗判定：自分が1位（かつクリア済み）ならwin、それ以外はloseを再生
+            if (list.length > 0) {
+                if (list[0].uid === currentUserId && list[0].time !== null) {
+                    playBuffer('win');
+                } else {
+                    playBuffer('lose');
+                }
+            }
+
             const listDiv = document.getElementById('resultList');
             listDiv.innerHTML = '';
             
@@ -1305,28 +1312,6 @@
             showModal('roomResultUI');
         }
 
-        // もういちど（待機室へ戻る）
-        document.getElementById('backToWaitingBtn').addEventListener('click', async () => {
-            if (!currentRoomId) return;
-            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
-            try {
-                // 代表者がwaitingに戻す
-                const docSnap = await getDoc(roomRef);
-                if (docSnap.exists() && docSnap.data().state === 'finished') {
-                    // ★ waitingに戻すだけでなく、全員のステータスを確実にリセットする
-                    const data = docSnap.data();
-                    const updates = { state: 'waiting', lastActivity: new Date().getTime() };
-                    Object.keys(data.players).forEach(uid => {
-                        updates[`players.${uid}.progress`] = 0;
-                        updates[`players.${uid}.time`] = null;
-                    });
-                    await updateDoc(roomRef, updates);
-                }
-            } catch(e) { console.error(e); }
-            // onSnapshotでwaitingを検知してUIが変わる
-        });
-
-        // へやから退出する共通処理
         async function leaveCurrentRoom() {
             if (currentRoomId && currentUserId && isFirebaseReady) {
                 try {
@@ -1336,12 +1321,10 @@
                         const data = docSnap.data();
                         const players = data.players || {};
                         const updates = {
-                            // データベースのプレイヤーリストから自分を完全に削除する
                             [`players.${currentUserId}`]: deleteField(),
                             lastActivity: new Date().getTime()
                         };
                         
-                        // ★ もし退出によって自分以外誰もいなくなるなら、部屋を強制的に待機状態に戻す
                         if (Object.keys(players).length <= 1) {
                             updates.state = 'waiting';
                         }
@@ -1354,13 +1337,11 @@
             }
         }
 
-        // やめるボタン（画面上のヘッダーにあるボタン）
         document.getElementById('leaveRoomBtn').addEventListener('click', async () => {
             await leaveCurrentRoom();
             modeSingleBtn.click();
         });
         
-        // 待機室のキャンセルボタン（新しく追加した×ボタン）
         cancelWaitingBtn.addEventListener('click', async () => {
             await leaveCurrentRoom();
             modeSingleBtn.click();
@@ -1371,7 +1352,6 @@
         // UI & イベントリスナー
         // ==========================================
 
-        // 操作系ボタンやスイッチにクリック音を追加
         const clickSoundElements = [
             modeSingleBtn, modeMultiBtn, openSettingsBtn, closeSettingsBtn, applySettingsBtn,
             document.getElementById('resetBtn'), document.getElementById('nextBtn'),
@@ -1384,20 +1364,17 @@
             if (el) el.addEventListener('click', playClick);
         });
 
-        // --- 設定画面の処理 ---
         function closeSettings() {
             hideModal();
             isVoiceEnabled = voiceToggle.checked;
             isSoundEffectsEnabled = seToggle.checked;
             
-            // iOS等で音声を有効化するためのロック解除（無音再生）
             if (isVoiceEnabled && window.speechSynthesis) {
                 const ut = new SpeechSynthesisUtterance("");
                 ut.volume = 0;
                 window.speechSynthesis.speak(ut);
             }
             
-            // ボール数が変更されていたらリセット
             const currentCount = parseInt(ballCountInput.value, 10) || 10;
             if (currentCount !== previousBallCount) {
                 previousBallCount = currentCount;
@@ -1406,7 +1383,6 @@
         }
 
         openSettingsBtn.addEventListener('click', () => {
-            // 開いたときの数を記憶しておく
             previousBallCount = parseInt(ballCountInput.value, 10) || 10;
             showModal('settingsUI');
         });
@@ -1414,7 +1390,6 @@
         closeSettingsBtn.addEventListener('click', closeSettings);
         applySettingsBtn.addEventListener('click', closeSettings);
         
-        // 画面サイズに合わせてキャンバスをリサイズし、配置を維持したまま再描画する
         function resizeCanvasAndDraw() {
             canvas.width = container.clientWidth;
             canvas.height = container.clientHeight;
@@ -1424,32 +1399,31 @@
             }
         }
 
-        // タイトル画面を消す処理
         titleScreen.addEventListener('click', () => {
-            unlockAllAudio(); // ★ mp3音声の準備（スマホ対応）
-            initAudio(); // 音声エンジン（Web Audio API）の初期化
+            resumeAudioContext(); // 音声エンジンのアンロック
+            playBuffer('enter'); // スタート音の再生
 
-            // スタート音の再生
-            enterSound.currentTime = 0;
-            enterSound.play().catch(e => console.log("Audio play error:", e));
+            // ★ 音声合成エンジンのウォーミングアップ（「1」の読み上げのラグをなくす）
+            if (window.speechSynthesis) {
+                const ut = new SpeechSynthesisUtterance("");
+                ut.volume = 0;
+                window.speechSynthesis.speak(ut);
+            }
 
             titleScreen.classList.add('opacity-0');
             setTimeout(() => {
                 titleScreen.classList.add('hidden');
-                // ★ シャッフルはせず、すでに裏で配置済みのボールの画面サイズ調整のみ行う
                 resizeCanvasAndDraw(); 
             }, 500);
         });
 
-        // ポップアップを閉じるボタン
         closeSetupBtn.addEventListener('click', () => {
-            modeSingleBtn.click(); // 「ひとりで」モードに戻る処理を呼び出して閉じる
+            modeSingleBtn.click(); 
         });
 
         document.getElementById('resetBtn').addEventListener('click', initSingleGame);
         document.getElementById('nextBtn').addEventListener('click', initSingleGame);
         
-        // ★ ボールの上限100のバリデーション処理
         function validateBallCount() {
             let val = parseInt(ballCountInput.value, 10);
             if (val > 100) {
@@ -1473,7 +1447,6 @@
         window.addEventListener('resize', () => {
             clearTimeout(window.resizeTimer);
             window.resizeTimer = setTimeout(() => {
-                // ★ シングル・マルチ問わず、シャッフルせずに画面サイズにフィットさせるだけにする
                 resizeCanvasAndDraw();
             }, 200);
         });
