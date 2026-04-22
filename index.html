@@ -799,29 +799,27 @@
 
             for (const ball of balls) {
                 const isReached = ball.number < targetNumber;
-                const isTarget = ball.number === targetNumber;
+                // 次のターゲットの強調をなくすため、isTargetは特別扱いしない
 
                 ctx.beginPath();
-                const currentRadius = isTarget ? ball.radius * 1.15 : ball.radius;
+                // ターゲットでも半径を大きくしない
+                const currentRadius = ball.radius;
                 ctx.arc(ball.x, ball.y, currentRadius, 0, Math.PI * 2);
 
                 if (isReached) {
                     ctx.fillStyle = '#3b82f6';
                     ctx.fill();
                     ctx.strokeStyle = '#1e3a8a';
-                } else if (isTarget) {
-                    ctx.fillStyle = '#eff6ff';
-                    ctx.fill();
-                    ctx.strokeStyle = '#2563eb';
                 } else {
+                    // まだ到達していないボール（次のターゲットも含む）はすべて同じ見た目にする
                     ctx.fillStyle = '#ffffff';
                     ctx.fill();
                     ctx.strokeStyle = '#94a3b8';
                 }
-                ctx.lineWidth = isTarget ? 4 : 2;
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
-                ctx.fillStyle = isReached ? '#ffffff' : (isTarget ? '#1d4ed8' : '#475569');
+                ctx.fillStyle = isReached ? '#ffffff' : '#475569';
                 ctx.font = `bold ${currentRadius * 1.1}px "M PLUS Rounded 1c", sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -838,7 +836,8 @@
             const dy = pointerPos.y - targetBall.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < targetBall.radius * 1.8) {
+            // ★ 当たり判定を 1.8倍 から 1.2倍（ボールの見た目よりわずかに大きい程度）に厳格化
+            if (dist < targetBall.radius * 1.2) {
                 
                 if (gameMode === 'single' && targetNumber === 1) {
                     startTimer();
