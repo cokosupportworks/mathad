@@ -369,12 +369,6 @@
         });
         document.addEventListener('touchstart', resumeAudioContext, { passive: true });
 
-        // クリック音
-        function playClick(e) {
-            if (e && e.type === 'click' && !e.isTrusted) return;
-            playBuffer('click');
-        }
-
         // --- Voice Setup (音声合成) ---
         let cachedVoice = null;
         function initVoice() {
@@ -388,18 +382,44 @@
             initVoice();
         }
 
+        // ★ 音声エンジンのウォーミングアップ用（スリープ防止）
+        function wakeupVoice() {
+            if (!isVoiceEnabled || !window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const ut = new SpeechSynthesisUtterance('　'); // 全角スペース（発音されないがエンジンを動かす）
+            ut.volume = 0;
+            ut.rate = 2.0; // 早く終わらせる
+            if (cachedVoice) ut.voice = cachedVoice;
+            window.speechSynthesis.speak(ut);
+        }
+
+        // クリック音
+        function playClick(e) {
+            if (e && e.type === 'click' && !e.isTrusted) return;
+            playBuffer('click');
+            // ★ ボタン操作のたびにエンジンを温め直す
+            wakeupVoice();
+        }
+
+        let speakTimeout = null;
         function speakNumber(num) {
             if (!isVoiceEnabled || !window.speechSynthesis) return;
             
+            // 連続タッチ時のタイマーをリセット
+            if (speakTimeout) clearTimeout(speakTimeout);
+            
             window.speechSynthesis.cancel();
             
-            const ut = new SpeechSynthesisUtterance(num.toString());
-            ut.lang = 'ja-JP';
-            ut.rate = 1.3;
-            ut.pitch = 1.6;
-            
-            if (cachedVoice) ut.voice = cachedVoice;
-            window.speechSynthesis.speak(ut);
+            // ★ iOS等のcancel直後のキュー詰まり・順序逆転バグを防ぐため微小な遅延を入れる
+            speakTimeout = setTimeout(() => {
+                const ut = new SpeechSynthesisUtterance(num.toString());
+                ut.lang = 'ja-JP';
+                ut.rate = 1.3;
+                ut.pitch = 1.6;
+                
+                if (cachedVoice) ut.voice = cachedVoice;
+                window.speechSynthesis.speak(ut);
+            }, 20);
         }
 
         // --- Sound Effects Setup (キラキラ音) ---
@@ -880,9 +900,13 @@
             
             finalTime = stopTimer();
 
-            // ゴール時の音声を無条件に再生
+            // ゴール時の音声を再生
             playBuffer('goal');
-            playBuffer('yokudekimashita');
+            
+            // ★ yokudekimashita.mp3 は「ひとりで」モード限定
+            if (gameMode === 'single') {
+                playBuffer('yokudekimashita');
+            }
 
             if (gameMode === 'single') {
                 setTimeout(() => {
@@ -1370,9 +1394,7 @@
             isSoundEffectsEnabled = seToggle.checked;
             
             if (isVoiceEnabled && window.speechSynthesis) {
-                const ut = new SpeechSynthesisUtterance("");
-                ut.volume = 0;
-                window.speechSynthesis.speak(ut);
+                wakeupVoice();
             }
             
             const currentCount = parseInt(ballCountInput.value, 10) || 10;
@@ -1404,11 +1426,7 @@
             playBuffer('enter'); // スタート音の再生
 
             // ★ 音声合成エンジンのウォーミングアップ（「1」の読み上げのラグをなくす）
-            if (window.speechSynthesis) {
-                const ut = new SpeechSynthesisUtterance("");
-                ut.volume = 0;
-                window.speechSynthesis.speak(ut);
-            }
+            wakeupVoice();
 
             titleScreen.classList.add('opacity-0');
             setTimeout(() => {
