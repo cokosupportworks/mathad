@@ -560,6 +560,9 @@
             const marginRatio = 0.01;
             const paddingRatio = actualRadiusRatio + marginRatio;
 
+            // ★ 上部のタイマーや進捗バーと被らないよう、上から25%のエリアは配置禁止とする
+            const topMarginRatio = 0.25;
+
             let placedAll = false;
 
             while (!placedAll && actualRadiusRatio >= minRadiusRatio) {
@@ -572,7 +575,11 @@
 
                     while (!placed && attempts < 200) {
                         const x = paddingRatio + Math.random() * (1 - paddingRatio * 2);
-                        const y = paddingRatio + Math.random() * (1 - paddingRatio * 2);
+                        
+                        // ★ yの計算を変更: 最低でも topMarginRatio より下に配置する
+                        const minY = Math.max(paddingRatio, topMarginRatio);
+                        const maxY = 1 - paddingRatio;
+                        const y = minY + Math.random() * (maxY - minY);
                         
                         let overlap = false;
                         for (const ball of data) {
@@ -601,7 +608,8 @@
             if (!placedAll) {
                 for (let i = data.length + 1; i <= count; i++) {
                     const x = paddingRatio + Math.random() * (1 - paddingRatio * 2);
-                    const y = paddingRatio + Math.random() * (1 - paddingRatio * 2);
+                    const minY = Math.max(paddingRatio, topMarginRatio);
+                    const y = minY + Math.random() * (1 - paddingRatio - minY);
                     data.push({ x, y, r: actualRadiusRatio, n: i });
                 }
             }
@@ -970,7 +978,7 @@
                 
                 const currentCount = parseInt(ballCountInput.value, 10) || 10;
                 
-                // ★ FirestoreのserverTimestampを取得するためのダミー関数（モジュールのロード状況に依存しないように）
+                // FirestoreのserverTimestampを取得するためのダミー関数（モジュールのロード状況に依存しないように）
                 const now = new Date().getTime();
 
                 if (!docSnap.exists()) {
@@ -990,12 +998,18 @@
                     const playerCount = Object.keys(players).length;
                     const lastAct = data.lastActivity || 0;
                     
+                    const amIInRoom = !!players[currentUserId];
+
                     // ゴースト部屋（ロック状態）の解除判定:
                     // 1. 誰もいないのにplayingになっている場合
-                    // 2. playingだけど3分以上（180000ms）誰も操作していない場合
-                    const isGhostRoom = (data.state === 'playing') && (playerCount === 0 || (now - lastAct > 180000));
+                    // 2. playingだけど自分がすでにいる（リロード時など）
+                    // 3. playingだけど1分以上（60000ms）誰も操作していない場合
+                    const isGhostRoom = (data.state === 'playing') && (playerCount === 0 || amIInRoom || (now - lastAct > 60000));
 
-                    if (data.state !== 'waiting' && !isGhostRoom) {
+                    // 入室可能な条件
+                    const canJoin = data.state === 'waiting' || data.state === 'finished' || isGhostRoom;
+
+                    if (!canJoin) {
                         btn.disabled = false;
                         btn.innerText = "へやに はいる";
                         errorMsg.innerText = "そのへやは もう ゲームが はじまっています！";
@@ -1003,15 +1017,16 @@
                         return;
                     }
 
-                    // 既存部屋に参加（ゴースト部屋だった場合は自分が最初の参加者として上書き）
+                    // 既存部屋に参加
                     const updates = {
                         [`players.${currentUserId}`]: { name: playerName, progress: 0, time: null },
                         lastActivity: now
                     };
                     
-                    if (isGhostRoom) {
+                    // 結果発表の画面で止まっていた部屋に入った場合や、ゴースト部屋だった場合は初期化する
+                    if (data.state === 'finished' || isGhostRoom) {
                         updates.state = 'waiting';
-                        // ゴーストプレイヤーを一掃する
+                        // 過去のプレイヤーを一掃する
                         Object.keys(players).forEach(uid => {
                             if (uid !== currentUserId) updates[`players.${uid}`] = deleteField();
                         });
@@ -1301,7 +1316,14 @@
                 // 代表者がwaitingに戻す
                 const docSnap = await getDoc(roomRef);
                 if (docSnap.exists() && docSnap.data().state === 'finished') {
-                    await updateDoc(roomRef, { state: 'waiting' });
+                    // ★ waitingに戻すだけでなく、全員のステータスを確実にリセットする
+                    const data = docSnap.data();
+                    const updates = { state: 'waiting', lastActivity: new Date().getTime() };
+                    Object.keys(data.players).forEach(uid => {
+                        updates[`players.${uid}.progress`] = 0;
+                        updates[`players.${uid}.time`] = null;
+                    });
+                    await updateDoc(roomRef, updates);
                 }
             } catch(e) { console.error(e); }
             // onSnapshotでwaitingを検知してUIが変わる
@@ -1312,10 +1334,23 @@
             if (currentRoomId && currentUserId && isFirebaseReady) {
                 try {
                     const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
-                    await updateDoc(roomRef, {
-                        // データベースのプレイヤーリストから自分を完全に削除する
-                        [`players.${currentUserId}`]: deleteField()
-                    });
+                    const docSnap = await getDoc(roomRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        const players = data.players || {};
+                        const updates = {
+                            // データベースのプレイヤーリストから自分を完全に削除する
+                            [`players.${currentUserId}`]: deleteField(),
+                            lastActivity: new Date().getTime()
+                        };
+                        
+                        // ★ もし退出によって自分以外誰もいなくなるなら、部屋を強制的に待機状態に戻す
+                        if (Object.keys(players).length <= 1) {
+                            updates.state = 'waiting';
+                        }
+                        
+                        await updateDoc(roomRef, updates);
+                    }
                 } catch(e) {
                     console.error("へやからの退出にしっぱいしました", e);
                 }
