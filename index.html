@@ -488,6 +488,8 @@
                 onSnapshot = dbMod.onSnapshot;
                 getDoc = dbMod.getDoc;
                 deleteField = dbMod.deleteField;
+                // ★ serverTimestampを追加
+                const serverTimestamp = dbMod.serverTimestamp;
 
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
                 let firebaseConfig = null;
@@ -958,7 +960,6 @@
             }
 
             try {
-                // 一時的にボタンを無効化
                 const btn = document.getElementById('joinRoomBtn');
                 btn.disabled = true;
                 btn.innerText = "つうしんちゅう...";
@@ -967,31 +968,56 @@
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                 const docSnap = await getDoc(roomRef);
                 
+                const currentCount = parseInt(ballCountInput.value, 10) || 10;
+                
+                // ★ FirestoreのserverTimestampを取得するためのダミー関数（モジュールのロード状況に依存しないように）
+                const now = new Date().getTime();
+
                 if (!docSnap.exists()) {
                     // 新規部屋作成
-                    const currentCount = parseInt(ballCountInput.value, 10) || 10;
                     await setDoc(roomRef, {
                         state: 'waiting',
                         ballCount: currentCount,
                         ballLayout: [],
+                        lastActivity: now, // 最後に部屋が動いた時間
                         players: {
                             [currentUserId]: { name: playerName, progress: 0, time: null }
                         }
                     });
                 } else {
-                    // 既存部屋に参加
                     const data = docSnap.data();
-                    if (data.state !== 'waiting') {
+                    const players = data.players || {};
+                    const playerCount = Object.keys(players).length;
+                    const lastAct = data.lastActivity || 0;
+                    
+                    // ゴースト部屋（ロック状態）の解除判定:
+                    // 1. 誰もいないのにplayingになっている場合
+                    // 2. playingだけど3分以上（180000ms）誰も操作していない場合
+                    const isGhostRoom = (data.state === 'playing') && (playerCount === 0 || (now - lastAct > 180000));
+
+                    if (data.state !== 'waiting' && !isGhostRoom) {
                         btn.disabled = false;
                         btn.innerText = "へやに はいる";
                         errorMsg.innerText = "そのへやは もう ゲームが はじまっています！";
                         errorMsg.classList.remove('hidden');
                         return;
                     }
-                    // 追加
-                    await updateDoc(roomRef, {
-                        [`players.${currentUserId}`]: { name: playerName, progress: 0, time: null }
-                    });
+
+                    // 既存部屋に参加（ゴースト部屋だった場合は自分が最初の参加者として上書き）
+                    const updates = {
+                        [`players.${currentUserId}`]: { name: playerName, progress: 0, time: null },
+                        lastActivity: now
+                    };
+                    
+                    if (isGhostRoom) {
+                        updates.state = 'waiting';
+                        // ゴーストプレイヤーを一掃する
+                        Object.keys(players).forEach(uid => {
+                            if (uid !== currentUserId) updates[`players.${uid}`] = deleteField();
+                        });
+                    }
+
+                    await updateDoc(roomRef, updates);
                 }
 
                 btn.disabled = false;
@@ -1119,8 +1145,11 @@
             if (!docSnap.exists()) return;
             
             const data = docSnap.data();
-            // 全員のステータスをリセット
-            const updates = { state: 'playing' };
+            // 全員のステータスを確実にリセット
+            const updates = { 
+                state: 'playing',
+                lastActivity: new Date().getTime() // 活動時間を更新
+            };
             Object.keys(data.players).forEach(uid => {
                 updates[`players.${uid}.progress`] = 0;
                 updates[`players.${uid}.time`] = null;
@@ -1184,10 +1213,11 @@
                     try {
                         const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
                         await updateDoc(roomRef, {
-                            [`players.${currentUserId}.progress`]: pendingProgress
+                            [`players.${currentUserId}.progress`]: pendingProgress,
+                            lastActivity: new Date().getTime() // 進捗があるたびに活動時間を更新
                         });
                     } catch(e) { console.error(e); }
-                }, 400); // 400msに1回だけ送信（Firebaseの制限対策）
+                }, 400); 
             }
         }
 
@@ -1196,13 +1226,32 @@
             if (!currentRoomId) return;
             try {
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
-                // 最後の進捗も確実に送る
                 await updateDoc(roomRef, {
                     [`players.${currentUserId}.progress`]: balls.length,
-                    [`players.${currentUserId}.time`]: time
+                    [`players.${currentUserId}.time`]: time,
+                    lastActivity: new Date().getTime()
                 });
             } catch(e) { console.error(e); }
         }
+
+        // もういちど（待機室へ戻る）
+        document.getElementById('backToWaitingBtn').addEventListener('click', async () => {
+            if (!currentRoomId) return;
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            try {
+                const docSnap = await getDoc(roomRef);
+                if (docSnap.exists() && docSnap.data().state === 'finished') {
+                    const data = docSnap.data();
+                    // ★ waitingに戻すだけでなく、全員のステータスを確実にリセットする
+                    const updates = { state: 'waiting', lastActivity: new Date().getTime() };
+                    Object.keys(data.players).forEach(uid => {
+                        updates[`players.${uid}.progress`] = 0;
+                        updates[`players.${uid}.time`] = null;
+                    });
+                    await updateDoc(roomRef, updates);
+                }
+            } catch(e) { console.error(e); }
+        });
 
         // 結果発表
         function showResult(players) {
