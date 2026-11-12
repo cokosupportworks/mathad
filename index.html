@@ -36,6 +36,221 @@
         .animate-float {
             animation: float 3s ease-in-out infinite;
         }
+        /* MASUADO ARCADE — clear numbers, tactile controls, a bright playfield. */
+        :root { --ink:#252347; --cabinet:#242143; --mint:#72f1d5; --yellow:#ffe178; --pink:#ff8ca8; --violet:#a89aff; }
+        body { background-color:#242143!important; background-image:radial-gradient(ellipse at 12% 0%,#48416f 0,transparent 52%),radial-gradient(ellipse at 100% 100%,#344765 0,transparent 48%); color:var(--ink); padding:18px 26px 0; gap:0; }
+        body::before { content:''; position:absolute; inset:0; opacity:.08; pointer-events:none; background-image:radial-gradient(#fff 1px,transparent 1px); background-size:12px 12px; }
+        button,input { font:inherit; }
+        button { -webkit-tap-highlight-color:transparent; }
+        button:focus-visible,input:focus-visible { outline:4px solid #f5bd40!important; outline-offset:4px; }
+        button:disabled { cursor:not-allowed; }
+        .hidden { display:none!important; }
+        #titleScreen { margin:0; }
+        #titleScreen button { box-shadow:none; }
+        #arcadeHeader { background:none; box-shadow:none; padding:0 0 18px; gap:16px; flex-direction:row; flex-shrink:0; align-items:center; }
+        #arcadeHeader > div:first-child { gap:32px; width:auto; flex:1; justify-content:flex-start; }
+        #arcadeHeader h1 { display:flex;align-items:center;margin:0;gap:12px; color:white; white-space:nowrap; }
+        .brand-mark { display:grid; place-items:center; width:51px; height:51px; background:var(--yellow); border:2px solid #17152f; border-radius:17px; box-shadow:0 4px 0 #14122c, inset 0 2px 0 #fff9; transform:rotate(-7deg); }
+        .brand-mark svg { width:29px;height:29px;color:var(--ink); }
+        .brand-copy { display:flex;flex-direction:column;line-height:1.1; }
+        .brand-copy strong { font-size:29px;letter-spacing:.06em; }
+        .brand-copy small { font-size:10px;letter-spacing:.15em;color:#c6bfe6;margin-top:7px; }
+        .mode-switch { margin:0!important;padding:5px!important;border-radius:17px!important;background:#15132d!important;gap:4px;border:1px solid #645c87;box-shadow:inset 0 2px 3px #0004; }
+        .mode-switch button { min-height:43px; min-width:112px; border-radius:12px!important;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 16px!important;font-size:14px!important;transition:background .18s,transform .18s; }
+        .mode-switch svg { width:18px;height:18px; }
+        .mode-switch button[aria-pressed="true"] { background:var(--mint)!important;color:#1f3544!important;box-shadow:0 3px 0 #268f84,inset 0 2px 0 #fff8!important; }
+        .mode-switch button[aria-pressed="false"] { background:transparent!important;color:#c9c2e6!important;box-shadow:none!important; }
+        #controlsUI,#multiStatusUI { width:auto;gap:10px;flex-shrink:0; }
+        #openSettingsBtn { width:46px;height:46px;border-radius:15px;background:#f5f1ff;color:#494069;box-shadow:0 4px 0 #aaa1c9;border:2px solid #fff7;padding:10px; }
+        #openSettingsBtn svg { width:23px;height:23px; }
+        #resetBtn,#leaveRoomBtn { min-height:46px;border-radius:15px;padding:10px 18px;background:var(--yellow);color:#44322c;box-shadow:0 4px 0 #bd8847,inset 0 2px 0 #fff8;border:2px solid #fff5;font-size:14px; }
+        #leaveRoomBtn { background:#f4d9e8;box-shadow:0 4px 0 #b885a1; }
+        #multiStatusUI > div { background:#14132d;color:#ccc5e5;border:1px solid #6b608e; }
+        #currentRoomDisplay { color:var(--mint);max-width:100px;overflow:hidden;text-overflow:ellipsis; }
+        #gameOverlayUI { position:relative;inset:auto;opacity:1!important;width:auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:14px;padding:0 2px 15px;flex-shrink:0;pointer-events:none;min-height:86px; }
+        .hud-timer { display:flex;align-items:center;gap:12px;color:white; }
+        .hud-timer > svg { width:40px;height:40px;padding:9px;border-radius:14px;background:#393454;border:1px solid #6d658a;color:var(--yellow); }
+        .hud-label { display:block;font-size:10px;letter-spacing:.13em;font-weight:700;color:#c4bddf; }
+        .timer-value { font-size:29px;line-height:1.15;letter-spacing:.03em;font-variant-numeric:tabular-nums; }
+        .timer-value small { color:#c4bddf;font-size:11px;padding-left:5px; }
+        .hud-mission { text-align:center;color:white;min-width:156px; }
+        .hud-mission .hud-label { margin-bottom:2px; }
+        .mission-value { font-size:15px;line-height:1.3;display:flex;align-items:baseline;justify-content:center;gap:8px;color:#c4bddf; }
+        #reachedCount { font-size:30px;color:var(--mint);font-variant-numeric:tabular-nums; }
+        #goalCount { color:#fff;font-size:19px; }
+        .mini-meter { height:5px;background:#14132e;border-radius:9px;margin:6px 4px 0;overflow:hidden; }
+        #hudProgress { display:block;height:100%;width:0;background:var(--mint);border-radius:9px;transition:width .2s ease; }
+        .hud-race { display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0; }
+        .solo-badge { display:flex;align-items:center;gap:10px;border:1px solid #6c6289;border-radius:16px;padding:10px 16px;background:#3a3356;color:white; }
+        .solo-badge svg { width:28px;height:28px;color:var(--yellow); }
+        .solo-badge span { display:block;font-size:10px;color:#c4bddf; }
+        .solo-badge strong { display:block;font-size:17px;letter-spacing:.04em; }
+        #multiRankUI { padding:4px 10px;border-radius:12px;background:var(--yellow);color:#302640;border:2px solid #fff6;box-shadow:0 3px 0 #ab7b42;font-size:15px;white-space:nowrap; }
+        #currentRankDisplay { font-size:26px; }
+        #multiplayerMarathon { max-width:none;min-width:60px;width:130px;height:32px;border:2px solid #8a80a4;background:#14132d;box-shadow:inset 0 3px 0 #0003;padding-left:10px;padding-right:24px; }
+        #canvasContainer { position:relative;width:auto;height:0;min-height:100px;flex:1 1 0%;border-radius:28px;border:5px solid #121128;outline:1px solid #6e658b;box-shadow:0 5px 0 #121128,0 0 0 5px #3c365b,inset 0 0 40px #b7b4d43b;background-color:#f4f6fe;background-image:radial-gradient(#9ba6c03b 1px,transparent 1px),radial-gradient(ellipse at 10% 0%,#d8f8f180,transparent 52%),radial-gradient(ellipse at 100% 100%,#e7defb9c,transparent 55%);background-size:22px 22px,100% 100%,100% 100%;isolation:isolate; }
+        #canvasContainer::after { content:'';position:absolute;inset:8px;border:1px solid #a7a3c43b;border-radius:15px;pointer-events:none;z-index:1; }
+        #gameCanvas { z-index:2; }
+        #feedbackCanvas { position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4; }
+        #confettiCanvas { z-index:12; }
+        .cabinet-footer { height:65px;display:flex;align-items:center;justify-content:space-between;padding:5px 6px 0;flex-shrink:0;position:relative;gap:15px; }
+        .footer-instruction { display:flex;align-items:center;gap:11px;color:#eee9ff;font-size:13px; }
+        .footer-instruction svg { width:24px;height:24px;color:var(--mint); }
+        .footer-instruction b { color:var(--yellow);font-size:16px; }
+        .footer-steps { display:flex;gap:7px;align-items:center;color:#81759d;font-size:13px; }
+        .footer-steps span { width:26px;height:26px;display:grid;place-items:center;border:1px solid #82739d;border-radius:8px;color:#cec4e6;background:#39314f;box-shadow:0 3px 0 #15132b; }
+        .cabinet-signature { color:#aaa0c4;font-size:9px;letter-spacing:.15em;display:flex;gap:8px;align-items:center; }
+        .cabinet-signature i { width:6px;height:6px;background:var(--mint);border-radius:50%;box-shadow:0 0 8px #72f1d570; }
+        #multiModal { background:#151229a8;backdrop-filter:blur(9px);padding:22px;touch-action:pan-y; }
+        #multiModal > div { border:3px solid #302847;border-radius:27px;box-shadow:0 8px 0 #151126,0 22px 70px #09061966;background:#fffdf7;max-height:calc(100dvh - 44px);overflow-y:auto;touch-action:pan-y; }
+        #multiModal > div::before { content:'';display:block;width:44px;height:5px;border-radius:4px;background:#d9d1e9;position:absolute;top:12px;left:calc(50% - 22px); }
+        #multiModal h2 { color:#332949;letter-spacing:.01em;margin-top:12px; }
+        #multiModal label { color:#4b4160; }
+        #multiModal input[type="text"],#multiModal input[type="number"] { border:2px solid #d3cae3;background:white;border-radius:13px;box-shadow:inset 0 3px 0 #f1edf7;color:#332949;min-height:46px; }
+        #multiModal input:disabled { background:#eeeaf5;color:#746a83; }
+        #roomSetupUI > div:first-child { display:none; }
+        #multiModal button:not([id^="close"]):not(#cancelWaitingBtn) { border:2px solid #312545;border-radius:15px;box-shadow:0 5px 0 #302445;transition:transform .14s,box-shadow .14s;background:var(--mint);color:#263b42; }
+        #multiModal #startMultiBtn,#multiModal #joinRoomBtn { background:var(--yellow);color:#3d3043; }
+        #multiModal #startMultiBtn:disabled { opacity:1;background:#e6e0ed;color:#82758e;box-shadow:0 4px 0 #beb2cb;border-color:#beb2cb; }
+        #multiModal button[id^="close"],#cancelWaitingBtn { color:#81728e; }
+        #playersList { background:#f0edf7;border-color:#dfd6e9;min-height:72px;max-height:174px;touch-action:pan-y; }
+        .player-row { padding:9px 10px;display:flex;align-items:center;gap:10px;border-radius:12px;background:white;border:1px solid #e2daec;font-size:14px; }
+        .player-row.is-me { border:2px solid #6edcc5;background:#effcf7; }
+        .player-avatar { width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#e8e1ff;color:#5a4380;font-size:15px;border-bottom:3px solid #c7b8e5;flex-shrink:0; }
+        .player-row.is-me .player-avatar { background:var(--mint);border-color:#46b49e;color:#254b45; }
+        .player-name { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1; }
+        .player-tag { font-size:10px;background:#ffe8a0;color:#70502c;border-radius:6px;padding:3px 6px;white-space:nowrap; }
+        #settingsOwnerDisplay { color:#423452;font-size:14px;line-height:1.7; }
+        #roomWaitingUI > div:has(#settingsOwnerDisplay) { background:#f4effc;border-color:#ddd1ef; }
+        #waitingRoomWord { color:#66528e;overflow-wrap:anywhere; }
+        #resultList { touch-action:pan-y; }
+        #resultList > div { background:#f5f0fa;border:2px solid #e1d6ec;border-radius:15px; }
+        #resultList > div:first-child { background:#fff1b8;border-color:#e7bb54; }
+        #roomResultUI { overflow:visible; }
+        #roomResultUI > div:first-child { top:-36px;filter:drop-shadow(0 6px 0 #302445); }
+        #centerMessageText { font-size:clamp(48px,10vw,100px);color:#4c3679!important;text-shadow:3px 3px 0 #fff!important;filter:drop-shadow(0 6px 0 #b6a3dd); }
+        #singleClearOverlay { background:#eeedffdb;backdrop-filter:blur(8px);padding:20px;gap:0; }
+        .clear-emblem { width:88px;height:88px;display:grid;place-items:center;background:var(--yellow);color:#4e3263;border:4px solid #4e3263;border-radius:28px;box-shadow:0 7px 0 #b092be;transform:rotate(-7deg);margin-bottom:22px; }
+        .clear-emblem svg { width:51px;height:51px; }
+        .clear-kicker { letter-spacing:.22em;font-size:12px;color:#735794;margin-bottom:9px; }
+        #singleClearOverlay h2 { color:#42315c;font-size:clamp(25px,5vw,56px);text-shadow:none!important;margin-bottom:18px;animation:none;white-space:nowrap; }
+        #singleClearTime { color:#5c4384;background:white;border:2px solid #c9b7e2;border-radius:15px;box-shadow:0 4px 0 #d5c7e7;font-size:clamp(19px,3vw,28px);padding:12px 24px;margin-bottom:26px; }
+        #nextBtn { background:var(--mint);color:#244942;border:3px solid #354549;border-radius:17px;box-shadow:0 6px 0 #354549;font-size:clamp(17px,3vw,23px);padding:15px 28px; }
+        #arcadeHeader button:active:not(:disabled),#multiModal button:active:not(:disabled),#nextBtn:active { transform:translateY(3px);box-shadow:0 1px 0 #322742; }
+        @media (hover:hover) { #arcadeHeader button:hover:not(:disabled),#nextBtn:hover { filter:brightness(1.06); } }
+        @media (max-width:760px) {
+            body { padding:12px 14px 0; }
+            #arcadeHeader { flex-wrap:wrap;gap:12px;padding-bottom:14px; }
+            #arcadeHeader > div:first-child { width:100%;gap:12px;justify-content:space-between; }
+            .brand-mark { width:40px;height:40px;border-radius:13px; }
+            .brand-mark svg { width:24px;height:24px; }
+            .brand-copy strong { font-size:23px; }.brand-copy small { font-size:8px;margin-top:5px; }
+            #arcadeHeader h1 { display:flex;align-items:center;margin:0;gap:8px; }
+            .mode-switch button { min-width:82px;min-height:36px;font-size:12px!important;padding:6px 10px!important;gap:4px; }.mode-switch svg { width:15px;height:15px; }
+            #controlsUI,#multiStatusUI { width:100%;justify-content:flex-end;gap:8px; }
+            #openSettingsBtn { width:37px;height:37px;padding:7px;border-radius:12px; }
+            #openSettingsBtn svg { width:19px;height:19px; }
+            #resetBtn,#leaveRoomBtn { min-height:37px;padding:7px 13px;font-size:12px;border-radius:12px; }
+            #gameOverlayUI { min-height:73px;padding:0 1px 12px;gap:8px; }
+            .hud-timer { gap:7px; }.hud-timer > svg { display:none; }.timer-value { font-size:24px; }.hud-label { font-size:9px;letter-spacing:.04em; }
+            .hud-mission { min-width:105px; }#reachedCount { font-size:25px; }#goalCount { font-size:16px; }.mission-value { gap:5px; }
+            .solo-badge { border-radius:12px;padding:8px 10px;gap:6px; }.solo-badge svg { width:21px;height:21px; }.solo-badge strong { font-size:14px; }.solo-badge span { font-size:8px; }
+            #multiplayerMarathon { display:none!important; }#multiRankUI { padding:2px 8px;font-size:13px; }#currentRankDisplay { font-size:24px; }
+            #canvasContainer { border-width:4px;border-radius:22px;outline-color:#716588;box-shadow:0 4px 0 #121128,0 0 0 3px #3c365b; }
+            #canvasContainer::after { inset:6px;border-radius:12px; }
+            .cabinet-footer { height:57px;padding:6px 1px 0;gap:8px; }.footer-instruction { gap:7px;font-size:11px; }.footer-instruction b { font-size:14px; }.footer-instruction svg { width:21px;height:21px; }.cabinet-signature { display:none; }
+            .footer-steps { gap:5px;font-size:10px; }.footer-steps span { width:22px;height:22px;border-radius:7px; }
+            #multiModal { padding:15px; }#multiModal > div { padding:25px 20px 23px;max-height:calc(100dvh - 30px);border-radius:24px; }
+            #multiModal h2 { font-size:23px; }
+            .clear-emblem { width:65px;height:65px;border-radius:20px;margin-bottom:15px; }.clear-emblem svg { width:38px;height:38px; }
+        }
+        @media (max-width:370px) { body{padding:10px 10px 0}.brand-copy small{display:none}.brand-copy strong{font-size:21px}.mode-switch button{min-width:74px;padding:6px 7px!important}.mode-switch svg{display:none}.solo-badge svg{display:none}.footer-steps{display:none} }
+        @media (max-height:550px) and (min-width:761px) { body{padding-top:10px}#arcadeHeader{padding-bottom:10px}.brand-mark{height:40px;width:40px}.brand-copy strong{font-size:23px}#gameOverlayUI{min-height:61px;padding-bottom:10px}.hud-mission .hud-label{display:none}.cabinet-footer{height:43px}.clear-emblem{display:none} }
+        @media (orientation:landscape) and (max-height:500px) and (max-width:760px) { body{padding-top:8px}#arcadeHeader{flex-wrap:nowrap;padding-bottom:9px;gap:10px}#arcadeHeader>div:first-child{width:auto;gap:16px}#controlsUI,#multiStatusUI{width:auto}.brand-copy small{display:none}.brand-mark{width:32px;height:32px}.brand-copy strong{font-size:20px}.mode-switch button{min-width:72px;min-height:32px}#gameOverlayUI{min-height:48px;padding-bottom:8px}.hud-label{font-size:8px}.timer-value{font-size:20px}#reachedCount{font-size:21px}.hud-mission .hud-label{display:none}.mini-meter{margin-top:3px}.solo-badge{padding:4px 8px}.cabinet-footer{height:36px}.clear-emblem{display:none}#singleClearOverlay h2{margin-bottom:10px}#singleClearTime{margin-bottom:14px} }
+        @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important;transition:none!important;scroll-behavior:auto!important; } }
+        body { touch-action:manipulation; }
+        .mode-switch button { white-space:nowrap; }
+        .solo-badge span { white-space:nowrap; }
+        @media (max-width:420px) { .mode-switch svg,.solo-badge svg { display:none; }.mode-switch button { min-width:76px; }.footer-steps { display:none; }.cabinet-footer { justify-content:center; }.footer-instruction { white-space:nowrap; } }
+        #multiModal #startMultiBtn,#multiModal #joinRoomBtn { background:var(--yellow)!important; }
+        #multiModal #startMultiBtn:disabled { background:#e6e0ed!important; }
+        #playersList { max-height:220px; }
+        @media (max-height:650px) {
+            #multiModal > div { padding:22px 18px 18px; }
+            #roomWaitingUI h2 { font-size:21px;margin-top:8px;margin-bottom:6px; }
+            #roomWaitingUI > .text-center { padding:5px;margin-bottom:12px; }
+            #playersList { padding:8px;max-height:152px;margin-bottom:12px; }
+            .player-row { padding:5px 8px;gap:8px;font-size:12px; }
+            .player-avatar { width:26px;height:26px;font-size:12px; }
+            .player-tag { font-size:9px;padding:3px 4px; }
+            #roomWaitingUI > div:has(#settingsOwnerDisplay) { padding:12px;margin-bottom:12px; }
+            #settingsOwnerDisplay { font-size:12px;line-height:20px;margin-bottom:8px; }
+            #multiSettingsHint { font-size:11px;line-height:17px;margin-top:6px; }
+            #multiModal #multiBallCount { min-height:40px;padding:6px;font-size:16px; }
+            #multiModal #startMultiBtn { padding:10px;font-size:18px; }
+            .clear-emblem { display:none; }
+            #singleClearOverlay h2 { margin-bottom:12px; }
+            #singleClearTime { padding:9px 18px;margin-bottom:18px; }
+        }
+        #marathonTrack .bg-orange-500 { background:var(--mint);color:#254b45; }
+        #marathonTrack .bg-blue-400 { background:#bba9ea;color:#3d2d5b; }
+        #roomResultUI { overflow-y:auto;overflow-x:hidden; }
+        #roomResultUI > div.result-emblem { position:relative;inset:auto;transform:rotate(-6deg);width:68px;height:68px;display:grid;place-items:center;background:var(--yellow);border:3px solid #4e3263;border-radius:21px;color:#4e3263;box-shadow:0 5px 0 #c9aad4;filter:none;margin:10px auto 18px; }
+        .result-emblem svg { width:40px;height:40px; }
+
+        /* A full-screen arcade finish, above both the board and its result panel. */
+        #confettiCanvas { position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:75!important;pointer-events:none!important; }
+        #victoryShow { position:fixed;inset:0;z-index:70;display:grid;place-items:center;overflow:hidden;pointer-events:none;isolation:isolate; }
+        #victoryShow .victory-backdrop { position:absolute;inset:-60%;background:repeating-conic-gradient(from -9deg at 50% 50%,#794bdd 0deg 15deg,#50309b 15deg 30deg);animation:victory-rays 2.6s ease-out both; }
+        #victoryShow .victory-halo { position:absolute;width:min(120vw,1100px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#fff7b1 0,#ffe876c9 18%,#ff9be355 43%,transparent 66%);animation:victory-halo 2.6s ease-out both; }
+        .victory-banner { position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;transform-origin:50% 60%;width:100%;padding:24px 12px;animation:victory-slam 2.6s cubic-bezier(.18,.85,.22,1) both; }
+        .victory-crown { width:clamp(100px,18vh,185px);height:clamp(100px,18vh,185px);filter:drop-shadow(0 10px 0 #351b61);transform:rotate(-9deg); }
+        .victory-crown svg { width:100%;height:100%;overflow:visible; }
+        #victoryTitle { position:relative;margin:0;color:#ffe969;font-size:clamp(68px,17vw,210px);line-height:1.2;letter-spacing:-.065em;white-space:nowrap;font-weight:900;-webkit-text-stroke:clamp(2px,.45vw,6px) #fff;paint-order:stroke fill;text-shadow:0 5px 0 #e48b31,0 10px 0 #a74a36,0 15px 0 #351a57,7px 16px 0 #351a57;transform:rotate(-7deg); }
+        #victoryShow.long-title #victoryTitle { font-size:clamp(44px,12.5vw,155px);letter-spacing:-.075em; }
+        #victorySubtitle { position:relative;margin:12px 0 0;padding:10px 26px;border:3px solid #3c225f;border-radius:999px;background:#fff7dc;box-shadow:0 6px 0 #3c225f;color:#5c3478;font-size:clamp(14px,2.2vw,26px);line-height:1.5;transform:rotate(-3deg); }
+        .victory-star { position:absolute;color:#ffe978;filter:drop-shadow(0 5px 0 #6b367e);font-size:clamp(42px,7vw,95px);animation:victory-star-pop 2.6s ease-out both; }
+        .victory-star:nth-of-type(1) { left:9%;top:17%;--turn:-18deg; }
+        .victory-star:nth-of-type(2) { right:9%;top:21%;--turn:23deg;animation-delay:.08s; }
+        .victory-star:nth-of-type(3) { left:15%;bottom:15%;--turn:15deg;animation-delay:.14s;color:#78ffe0; }
+        .victory-star:nth-of-type(4) { right:14%;bottom:12%;--turn:-20deg;animation-delay:.2s;color:#ffb3df; }
+        body.victory-active #canvasContainer { animation:victory-board-impact .45s ease-out; }
+        #singleClearOverlay { background:radial-gradient(ellipse at 50% 8%,#8054b8 0,#48316f 58%,#30234f 100%);backdrop-filter:none; }
+        #singleClearOverlay::before { content:'★  ★  ★';position:absolute;left:0;right:0;top:7%;text-align:center;letter-spacing:.8em;color:#ffe88599;font-size:clamp(18px,3vw,32px);pointer-events:none; }
+        #singleClearOverlay .clear-emblem { background:none;border:0;box-shadow:none;border-radius:0;width:100px;height:100px;filter:drop-shadow(0 7px 0 #25153e);margin-bottom:20px; }
+        #singleClearOverlay .clear-emblem svg { width:100%;height:100%; }
+        #singleClearOverlay .clear-kicker { color:#baffec;font-size:12px;letter-spacing:.25em; }
+        #singleClearOverlay h2 { color:#ffe887!important;text-shadow:0 3px 0 #b1683c,0 6px 0 #2d1747!important;font-size:clamp(26px,4.8vw,56px);margin-bottom:24px; }
+        #singleClearTime { background:#2d224b;color:#fff3cd;border-color:#b2a0d5;box-shadow:0 4px 0 #241538; }
+        #nextBtn { background:#8bffe1;border-color:#1d4546;box-shadow:0 7px 0 #1c363e,0 0 25px #87ffce25; }
+        @keyframes victory-slam {
+            0% { opacity:0;transform:scale(2.8) rotate(12deg); }
+            12% { opacity:1;transform:scale(.88) rotate(-3deg); }
+            20% { transform:scale(1.07) rotate(1deg); }
+            29%,78% { opacity:1;transform:scale(1) rotate(0); }
+            100% { opacity:0;transform:scale(1.15) translateY(-20px); }
+        }
+        @keyframes victory-rays { 0% { opacity:0;transform:scale(.6) rotate(-15deg); } 9%,69% { opacity:.97; } 100% { opacity:0;transform:scale(1.07) rotate(10deg); } }
+        @keyframes victory-halo { 0% { opacity:0;transform:scale(.1); } 18% { opacity:1;transform:scale(1.1); } 75% { opacity:1; } 100% { opacity:0;transform:scale(1.45); } }
+        @keyframes victory-star-pop { 0%,8% { opacity:0;transform:scale(0) rotate(0); } 25% { opacity:1;transform:scale(1.15) rotate(var(--turn)); } 74% { opacity:1; } 100% { opacity:0;transform:scale(1.4) rotate(var(--turn)) translateY(-25px); } }
+        @keyframes victory-board-impact { 0% { transform:scale(1); } 30% { transform:scale(1.016); } 65% { transform:scale(.996); } 100% { transform:scale(1); } }
+        @media (max-width:420px) { .victory-banner { gap:10px; }.victory-star { font-size:45px; }#victorySubtitle { padding:9px 16px;margin-top:10px; }#singleClearOverlay .clear-emblem{width:82px;height:82px;margin-bottom:15px}#singleClearOverlay h2{font-size:27px} }
+        @media (max-height:650px) { #singleClearOverlay .clear-emblem { display:none; }#singleClearOverlay::before{display:none}#singleClearOverlay h2{margin-bottom:15px}.victory-crown{width:100px;height:100px}.victory-banner{gap:10px} }
+        @media (orientation:landscape) and (max-height:500px) { .victory-crown{width:75px;height:75px}#victoryTitle{font-size:80px}#victoryShow.long-title #victoryTitle{font-size:64px}#victorySubtitle{font-size:14px;margin-top:0;padding:5px 20px}.victory-banner{gap:6px}#singleClearOverlay h2{font-size:27px;margin-bottom:12px} }
+        @media (prefers-reduced-motion:reduce) {
+            #victoryShow .victory-backdrop { opacity:.96;transform:none; }
+            #victoryShow .victory-halo { opacity:.7;transform:none; }
+            .victory-banner { opacity:1;transform:none; }
+            .victory-star { display:none; }
+        }
+        @media (orientation:landscape) and (max-height:500px) {
+            #singleClearOverlay { padding:10px; }
+            #singleClearOverlay .clear-kicker { display:none; }
+            #singleClearOverlay h2 { font-size:25px;margin-bottom:12px; }
+            #singleClearTime { padding:6px 16px;margin-bottom:12px;font-size:18px; }
+            #nextBtn { padding:10px 20px;font-size:17px; }
+        }
+
     </style>
 </head>
 <!-- ★レイアウト崩れ対策: fixed inset-0 w-full h-full を指定し、画面のスクロール領域外へのはみ出しを完全に固定 -->
@@ -51,23 +266,23 @@
     </div>
 
     <!-- ヘッダー -->
-    <header class="bg-white shadow-md p-2 sm:p-4 z-20 relative flex flex-col sm:flex-row justify-between items-center gap-2">
+    <header id="arcadeHeader" class="bg-white shadow-md p-2 sm:p-4 z-20 relative flex flex-col sm:flex-row justify-between items-center gap-2">
         <div class="flex items-center justify-between w-full sm:w-auto">
-            <h1 class="text-xl sm:text-2xl font-bold text-blue-600 flex items-center gap-2">
-                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                すうじつなぎ
+            <h1>
+                <span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1z"/></svg></span>
+                <span class="brand-copy"><strong>ますあど</strong><small>すうじつなぎ アーケード</small></span>
             </h1>
             
             <!-- モード切替タブ (スマホでは右寄せ、PCではタイトル横) -->
-            <div class="flex bg-blue-100 rounded-full p-1 ml-4 shadow-inner">
-                <button id="modeSingleBtn" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full bg-white text-blue-600 shadow transition-all">ひとりで</button>
-                <button id="modeMultiBtn" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full text-blue-500 hover:text-blue-600 transition-all">だれかと</button>
+            <div class="mode-switch flex bg-blue-100 rounded-full p-1 ml-4 shadow-inner" role="group" aria-label="あそびかた">
+                <button id="modeSingleBtn" aria-pressed="true" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full bg-white text-blue-600 shadow transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>ひとりで</button>
+                <button id="modeMultiBtn" aria-pressed="false" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full text-blue-500 hover:text-blue-600 transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="7" r="3.5"/><path d="M2 21v-3a7 7 0 0 1 14 0v3M17 4a3.5 3.5 0 0 1 0 7m2 3a6 6 0 0 1 3 5v2"/></svg>だれかと</button>
             </div>
         </div>
 
         <div id="controlsUI" class="flex items-center gap-3 sm:gap-6 w-full sm:w-auto justify-center sm:justify-end">
             <!-- 歯車の設定ボタン -->
-            <button id="openSettingsBtn" class="text-slate-500 hover:text-slate-700 transition-transform transform active:scale-95 bg-slate-100 p-2.5 rounded-full shadow-sm">
+            <button id="openSettingsBtn" aria-label="せってい" title="せってい" class="text-slate-500 hover:text-slate-700 transition-transform transform active:scale-95 bg-slate-100 p-2.5 rounded-full shadow-sm">
                 <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </button>
             <button id="resetBtn" class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-transform transform active:scale-95 text-sm sm:text-base">
@@ -86,31 +301,20 @@
         </div>
     </header>
 
+    <div id="gameOverlayUI" aria-label="ゲームのじょうほう">
+        <div class="hud-timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v5l3 2M9 2h6M12 2v3M18 5l2 2"/></svg><div><span class="hud-label">タイム</span><div class="timer-value"><span id="timerDisplay">0.00</span><small>秒</small></div></div></div>
+        <div class="hud-mission"><span class="hud-label">つないだ かず</span><div class="mission-value"><strong id="reachedCount">0</strong><span>/</span><span id="goalCount">10</span><small>こ</small></div><div class="mini-meter" aria-hidden="true"><span id="hudProgress"></span></div></div>
+        <div class="hud-race">
+            <div id="soloBadge" class="solo-badge"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1z"/></svg><div><span>こんかいの すうじ</span><strong id="rangeLabel">1〜10</strong></div></div>
+            <div id="multiRankUI" class="hidden"><span id="currentRankDisplay">1</span>位<span class="text-xs"> / <span id="totalPlayersDisplay">1</span>人</span></div>
+            <div id="multiplayerMarathon" class="hidden relative rounded-full flex items-center"><div class="absolute right-1 text-lg" aria-hidden="true">🏁</div><div id="marathonTrack" class="relative w-full h-full"></div></div>
+        </div>
+    </div>
+
     <!-- ゲーム画面領域 -->
     <div class="flex-grow relative overflow-hidden w-full h-full" id="canvasContainer">
-        <canvas id="gameCanvas" class="absolute inset-0 w-full h-full touch-none"></canvas>
-        <canvas id="confettiCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
-
-        <!-- プレイ中の情報オーバーレイ -->
-        <div id="gameOverlayUI" class="absolute top-2 sm:top-4 left-0 w-full px-2 sm:px-4 pointer-events-none z-10 flex flex-row items-center justify-between gap-1 sm:gap-4 transition-opacity duration-300 opacity-0">
-            <!-- 左：タイマー -->
-            <div class="text-lg sm:text-3xl font-bold text-blue-800 drop-shadow-md bg-white/80 backdrop-blur-sm border-2 border-white rounded-full px-3 sm:px-5 py-0.5 sm:py-1 shadow-lg shrink-0 whitespace-nowrap">
-                <span id="timerDisplay">0.00</span><span class="text-xs sm:text-lg ml-1">秒</span>
-            </div>
-            
-            <!-- 中央：順位表示（マルチプレイ用） -->
-            <div id="multiRankUI" class="hidden text-base sm:text-2xl font-bold text-orange-600 drop-shadow-md bg-white/80 backdrop-blur-sm border-2 border-orange-200 rounded-full px-3 sm:px-5 py-0.5 sm:py-1 shadow-lg shrink-0 text-center whitespace-nowrap">
-                <span id="currentRankDisplay">1</span>位<span class="text-[10px] sm:text-sm text-slate-500 ml-1 font-normal">/<span id="totalPlayersDisplay">1</span>人</span>
-            </div>
-
-            <!-- 右：マラソン方式進捗バー（マルチプレイ用） -->
-            <div id="multiplayerMarathon" class="hidden flex-grow max-w-[50%] sm:max-w-md relative h-10 sm:h-12 bg-white/80 backdrop-blur-sm border-2 border-slate-200 rounded-full shadow-inner flex items-center pr-6 pl-3 sm:pr-8 sm:pl-4 overflow-visible">
-                <!-- ゴール地点のマーク -->
-                <div class="absolute right-1 sm:right-2 text-xl sm:text-2xl z-0 opacity-80">🏁</div>
-                <!-- この中に各プレイヤーのアイコンをJSで絶対配置する -->
-                <div id="marathonTrack" class="relative w-full h-full"></div>
-            </div>
-        </div>
+        <canvas id="gameCanvas" role="img" aria-label="1から順番に数字をつなぐゲームの盤面" class="absolute inset-0 w-full h-full touch-none"></canvas>
+        <canvas id="feedbackCanvas" aria-hidden="true"></canvas>
 
         <!-- 画面中央のメッセージ表示 (カウントダウン等) -->
         <div id="centerMessage" class="absolute inset-0 flex items-center justify-center pointer-events-none z-20 hidden">
@@ -119,6 +323,8 @@
 
         <!-- シングルプレイ用クリア画面 -->
         <div id="singleClearOverlay" class="absolute inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center hidden z-30 transition-opacity duration-500 opacity-0">
+            <div class="clear-emblem" aria-hidden="true"><svg viewBox="0 0 160 160" fill="none" aria-hidden="true"><defs><linearGradient id="clearCupGold" x1="35" y1="30" x2="128" y2="140" gradientUnits="userSpaceOnUse"><stop stop-color="#fff8b3"/><stop offset=".38" stop-color="#ffe16b"/><stop offset="1" stop-color="#ef9e2c"/></linearGradient></defs><path d="m38 77-15 51 24-9 13 20 15-51m48-11 15 51-24-9-13 20-15-51" fill="#ff71ac" stroke="#70336f" stroke-width="5" stroke-linejoin="round"/><path d="M42 39H20v22c0 19 13 28 30 27m68-49h22v22c0 19-13 28-30 27" stroke="#693663" stroke-width="12" stroke-linejoin="round"/><path d="M42 39H20v22c0 19 13 28 30 27m68-49h22v22c0 19-13 28-30 27" stroke="#ffd961" stroke-width="6" stroke-linejoin="round"/><path d="M41 25h78v39c0 26-17 45-39 45S41 90 41 64V25Z" fill="url(#clearCupGold)" stroke="#693663" stroke-width="6"/><path d="M80 109v18m-23 4h46v16H57z" fill="#ffdf6a" stroke="#693663" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="m80 43 7 14 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2 7-14Z" fill="#fff8cf" stroke="#cd7f2c" stroke-width="3" stroke-linejoin="round"/><path d="M49 32h61" stroke="#fffbd2" stroke-width="5" stroke-linecap="round"/><path d="m22 9 3 7 7 3-7 3-3 7-3-7-7-3 7-3zm116 88 3 6 6 3-6 3-3 6-3-6-6-3 6-3z" fill="#fff2a4"/></svg></div>
+            <div class="clear-kicker">STAGE CLEAR!</div>
             <h2 class="text-5xl sm:text-7xl font-bold text-orange-500 mb-4 drop-shadow-lg text-center animate-float" style="text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff;">
                 よくできました！
             </h2>
@@ -131,6 +337,12 @@
         </div>
     </div>
 
+    <footer class="cabinet-footer">
+        <div class="footer-instruction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V6a2 2 0 0 1 4 0v6-2a2 2 0 0 1 4 0v2-1a2 2 0 0 1 4 0v5c0 4-2 6-6 6h-2c-3 0-4-2-6-5l-2-3a2 2 0 0 1 3-2l1 1Z"/><path d="M4 4 3 3m12 0 1-1M9 1V0"/></svg><span><b>1</b> から じゅんばんに つなごう！</span></div>
+        <div class="footer-steps" aria-hidden="true"><span>1</span>→<span>2</span>→<span>3</span>…<span>★</span></div>
+        <div class="cabinet-signature" aria-hidden="true"><i></i> MASUADO NUMBER CLUB</div>
+    </footer>
+
     <!-- マルチプレイ用 モーダル群 (キャンバス上に被せる) -->
     <div id="multiModal" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-40 hidden p-4">
         
@@ -139,7 +351,7 @@
             <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-blue-400 to-purple-500"></div>
             
             <!-- 閉じるボタン -->
-            <button id="closeSetupBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
+            <button id="closeSetupBtn" aria-label="とじる" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
@@ -147,11 +359,11 @@
             
             <div class="space-y-4">
                 <div>
-                    <label class="block text-slate-700 font-bold mb-1 text-sm">へやの あいことば</label>
+                    <label for="roomWordInput" class="block text-slate-700 font-bold mb-1 text-sm">へやの あいことば</label>
                     <input type="text" id="roomWordInput" placeholder="例: りんご" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-lg focus:border-blue-500 focus:outline-none transition-colors">
                 </div>
                 <div>
-                    <label class="block text-slate-700 font-bold mb-1 text-sm">きみの なまえ</label>
+                    <label for="playerNameInput" class="block text-slate-700 font-bold mb-1 text-sm">きみの なまえ</label>
                     <input type="text" id="playerNameInput" placeholder="例: たろう" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-lg focus:border-blue-500 focus:outline-none transition-colors">
                 </div>
             </div>
@@ -165,10 +377,10 @@
         </div>
 
         <!-- 待機室 -->
-        <div id="roomWaitingUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md hidden relative">
+        <div id="roomWaitingUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md max-h-[90dvh] overflow-y-auto hidden relative">
             
             <!-- 閉じる（キャンセル）ボタン -->
-            <button id="cancelWaitingBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
+            <button id="cancelWaitingBtn" aria-label="とじる" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
@@ -182,14 +394,23 @@
                 <!-- プレイヤーリストがここに入る -->
             </div>
 
-            <button id="startMultiBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 text-xl animate-pulse">
+            <div class="bg-blue-50 border-2 border-blue-100 rounded-xl p-4 mb-4">
+                <p id="settingsOwnerDisplay" class="font-bold text-blue-800 mb-3" aria-live="polite"></p>
+                <div class="flex items-center justify-between gap-3">
+                    <label for="multiBallCount" class="font-bold text-slate-700">ボールのかず</label>
+                    <input type="number" id="multiBallCount" value="10" min="2" max="100" step="1" inputmode="numeric" disabled class="w-24 border-2 border-blue-200 rounded-lg px-2 py-2 text-center text-lg font-bold disabled:bg-slate-100 disabled:text-slate-500">
+                </div>
+                <p id="multiSettingsHint" class="text-sm text-slate-600 mt-2" aria-live="polite"></p>
+                <p id="multiSettingsError" class="text-sm text-red-600 font-bold mt-2 hidden" role="alert"></p>
+            </div>
+            <button id="startMultiBtn" disabled class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 text-xl disabled:opacity-50 disabled:cursor-not-allowed">
                 スタート！
             </button>
         </div>
 
         <!-- 結果発表 -->
         <div id="roomResultUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md hidden relative">
-            <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-6xl">🏆</div>
+            <div class="result-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v5a5 5 0 0 1-10 0V3ZM7 5H3v3a4 4 0 0 0 5 4m9-7h4v3a4 4 0 0 1-5 4M12 13v5m-4 3v-3h8v3M6 21h12"/></svg></div>
             <h2 class="text-3xl font-bold text-center text-orange-500 mb-6 mt-4">けっかはっぴょう</h2>
 
             <div id="resultList" class="space-y-2 mb-6 max-h-[250px] overflow-y-auto pr-1">
@@ -209,7 +430,7 @@
 
         <!-- 設定画面 -->
         <div id="settingsUI" class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-sm hidden relative">
-            <button id="closeSettingsBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
+            <button id="closeSettingsBtn" aria-label="とじる" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors z-10 bg-white/50 rounded-full p-1">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <h2 class="text-2xl font-bold text-center text-slate-800 mb-6 mt-2">せってい</h2>
@@ -217,9 +438,10 @@
             <div class="space-y-6">
                 <!-- ボールの数 -->
                 <div class="flex items-center justify-between">
-                    <label class="font-bold text-slate-700 text-lg">ボールのかず</label>
-                    <input type="number" id="ballCount" value="10" min="2" max="100" class="w-20 border-2 border-blue-200 rounded-lg px-2 py-2 text-center text-lg font-bold focus:outline-none focus:border-blue-500">
+                    <label for="ballCount" class="font-bold text-slate-700 text-lg">ボールのかず</label>
+                    <input type="number" id="ballCount" value="10" min="2" max="100" step="1" inputmode="numeric" aria-describedby="ballCountHint" class="w-20 border-2 border-blue-200 rounded-lg px-2 py-2 text-center text-lg font-bold focus:outline-none focus:border-blue-500">
                 </div>
+                <p id="ballCountHint" class="text-sm text-slate-500">2〜100までの かずを えらんでね</p>
                 
                 <hr class="border-slate-100">
 
@@ -230,7 +452,7 @@
                         <span class="text-xs font-normal text-slate-500">※声が出ます</span>
                     </label>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="voiceToggle" class="sr-only peer" checked>
+                        <input type="checkbox" id="voiceToggle" aria-label="かずのよみあげ" class="sr-only peer" checked>
                         <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-500"></div>
                     </label>
                 </div>
@@ -244,7 +466,7 @@
                         <span class="text-xs font-normal text-slate-500">※線を引くときの音</span>
                     </label>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="seToggle" class="sr-only peer" checked>
+                        <input type="checkbox" id="seToggle" aria-label="こうかおん" class="sr-only peer" checked>
                         <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-500"></div>
                     </label>
                 </div>
@@ -255,6 +477,18 @@
             </button>
         </div>
     </div>
+
+    <div id="victoryShow" class="hidden" role="status" aria-live="polite">
+        <div class="victory-backdrop" aria-hidden="true"></div>
+        <div class="victory-halo" aria-hidden="true"></div>
+        <span class="victory-star" aria-hidden="true">★</span><span class="victory-star" aria-hidden="true">★</span><span class="victory-star" aria-hidden="true">★</span><span class="victory-star" aria-hidden="true">★</span>
+        <div class="victory-banner">
+            <div class="victory-crown" aria-hidden="true"><svg viewBox="0 0 160 160" fill="none" aria-hidden="true"><defs><linearGradient id="victoryCupGold" x1="35" y1="30" x2="128" y2="140" gradientUnits="userSpaceOnUse"><stop stop-color="#fff8b3"/><stop offset=".38" stop-color="#ffe16b"/><stop offset="1" stop-color="#ef9e2c"/></linearGradient></defs><path d="m38 77-15 51 24-9 13 20 15-51m48-11 15 51-24-9-13 20-15-51" fill="#ff71ac" stroke="#70336f" stroke-width="5" stroke-linejoin="round"/><path d="M42 39H20v22c0 19 13 28 30 27m68-49h22v22c0 19-13 28-30 27" stroke="#693663" stroke-width="12" stroke-linejoin="round"/><path d="M42 39H20v22c0 19 13 28 30 27m68-49h22v22c0 19-13 28-30 27" stroke="#ffd961" stroke-width="6" stroke-linejoin="round"/><path d="M41 25h78v39c0 26-17 45-39 45S41 90 41 64V25Z" fill="url(#victoryCupGold)" stroke="#693663" stroke-width="6"/><path d="M80 109v18m-23 4h46v16H57z" fill="#ffdf6a" stroke="#693663" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="m80 43 7 14 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2 7-14Z" fill="#fff8cf" stroke="#cd7f2c" stroke-width="3" stroke-linejoin="round"/><path d="M49 32h61" stroke="#fffbd2" stroke-width="5" stroke-linecap="round"/><path d="m22 9 3 7 7 3-7 3-3 7-3-7-7-3 7-3zm116 88 3 6 6 3-6 3-3 6-3-6-6-3 6-3z" fill="#fff2a4"/></svg></div>
+            <div id="victoryTitle">クリア！</div>
+            <p id="victorySubtitle">ぜんぶ つながった！</p>
+        </div>
+    </div>
+    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 
 
     <script>
@@ -271,6 +505,8 @@
         const voiceToggle = document.getElementById('voiceToggle');
         const seToggle = document.getElementById('seToggle');
         const ballCountInput = document.getElementById('ballCount');
+        const multiBallCountInput = document.getElementById('multiBallCount');
+        const startMultiBtn = document.getElementById('startMultiBtn');
 
         // Single Player UI
         const singleClearOverlay = document.getElementById('singleClearOverlay');
@@ -364,6 +600,7 @@
             source.buffer = audioBuffers[key];
             source.connect(audioCtx.destination);
             source.start(0);
+            return source;
         }
 
         // Web Audio APIのサスペンド復帰処理（ブラウザがスリープから戻った時など）
@@ -557,11 +794,14 @@
         let currentRoomId = null;
         let roomUnsubscribe = null;
         let isFirebaseReady = false;
+        let currentRoomData = null;
+        let roomActionPending = false;
+        let multiCountdownInterval = null;
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'suuji-tsunagi';
 
         let initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged;
-        let getFirestore, doc, setDoc, updateDoc, onSnapshot, getDoc, deleteField;
+        let getFirestore, doc, setDoc, updateDoc, onSnapshot, getDoc, deleteField, runTransaction;
 
         async function initFirebase() {
             try {
@@ -582,6 +822,7 @@
                 onSnapshot = dbMod.onSnapshot;
                 getDoc = dbMod.getDoc;
                 deleteField = dbMod.deleteField;
+                runTransaction = dbMod.runTransaction;
                 const serverTimestamp = dbMod.serverTimestamp;
 
                 const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
@@ -629,8 +870,77 @@
 
         initFirebase();
 
+        // 入力欄だけでなく、保存時・開始時・配置生成時にも同じ範囲を適用する。
+        function normalizeBallCount(value) {
+            const number = Number(value);
+            if (Number.isNaN(number)) return 2;
+            return Math.min(100, Math.max(2, Math.trunc(number)));
+        }
+
+        function getPlayerOrder(data) {
+            const players = data.players || {};
+            return [...new Set([...(Array.isArray(data.playerOrder) ? data.playerOrder : []), ...Object.keys(players)])]
+                .filter(uid => Object.prototype.hasOwnProperty.call(players, uid));
+        }
+
+        function getSettingsOwner(data) {
+            const order = getPlayerOrder(data);
+            return order.includes(data.settingsOwnerId) ? data.settingsOwnerId : (order[0] || null);
+        }
+
+        function getNextSettingsOwner(data) {
+            const order = getPlayerOrder(data);
+            if (order.includes(data.nextSettingsOwnerId)) return data.nextSettingsOwnerId;
+            return order[(order.indexOf(getSettingsOwner(data)) + 1) % order.length] || null;
+        }
+
+        function nextRoundUpdates(data) {
+            const updates = {
+                state: 'waiting',
+                settingsOwnerId: getNextSettingsOwner(data),
+                nextSettingsOwnerId: null,
+                playerOrder: getPlayerOrder(data),
+                ballCount: normalizeBallCount(data.ballCount),
+                ballLayout: [],
+                lastActivity: Date.now()
+            };
+            Object.keys(data.players || {}).forEach(uid => {
+                updates[`players.${uid}.progress`] = 0;
+                updates[`players.${uid}.time`] = null;
+            });
+            return updates;
+        }
+
+        function showMultiSettingsError(message = '') {
+            const error = document.getElementById('multiSettingsError');
+            error.textContent = message;
+            error.classList.toggle('hidden', !message);
+        }
+
+        function updateRoomSettings(data) {
+            const ownerId = getSettingsOwner(data);
+            const isOwner = ownerId === currentUserId;
+            const canEdit = data.state === 'waiting' && isOwner && !roomActionPending;
+            const ownerName = data.players?.[ownerId]?.name || 'おともだち';
+            document.getElementById('settingsOwnerDisplay').textContent = isOwner
+                ? 'かずを きめるひと：あなた'
+                : `かずを きめるひと：${ownerName}`;
+            // 自分が編集中の数字は、ほかの参加者の入退室で書き戻さない。
+            if (document.activeElement !== multiBallCountInput || !canEdit) {
+                multiBallCountInput.value = normalizeBallCount(data.ballCount);
+            }
+            multiBallCountInput.disabled = !canEdit;
+            startMultiBtn.disabled = !canEdit;
+            startMultiBtn.textContent = isOwner ? 'スタート！' : 'スタートを まってね';
+            document.getElementById('multiSettingsHint').textContent = roomActionPending
+                ? 'つうしんちゅう...'
+                : isOwner ? '2〜100まで。かずを きめて スタートしてね'
+                : 'きまった かずで、みんな いっしょに あそぶよ';
+        }
+
         // --- ゲームコア ロジック (配置生成) ---
         function generateBallsData(count) {
+            count = normalizeBallCount(count);
             let data = [];
             let baseRadiusRatio = 0.08;
             if (count > 50) baseRadiusRatio *= 0.4;
@@ -642,8 +952,8 @@
             const marginRatio = 0.01;
             const paddingRatio = actualRadiusRatio + marginRatio;
 
-            // ★ UIがスリムになったため、配置禁止エリアを 25% から 20% に縮小し、ゲーム領域を広げました
-            const topMarginRatio = 0.20;
+            // 情報パネルは盤面の外に配置し、数字には画面全体を使う。
+            const topMarginRatio = 0.02;
 
             let placedAll = false;
 
@@ -745,10 +1055,10 @@
         // --- ゲーム進行 (シングル) ---
         function initSingleGame() {
             gameMode = 'single';
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
+            updateArcadeMode();
+            sizeGameCanvas();
 
-            const count = parseInt(ballCountInput.value, 10) || 10;
+            const count = validateBallCount();
             const data = generateBallsData(count);
             applyBallsData(data);
             
@@ -756,6 +1066,7 @@
             isDrawing = false;
             isDrawingAllowed = true;
             resetTimer();
+            clearConnectionEffects();
             
             singleClearOverlay.classList.add('hidden');
             singleClearOverlay.classList.remove('opacity-100');
@@ -765,66 +1076,163 @@
             draw();
         }
 
-        // --- 描画処理 ---
+        // --- Arcade presentation (the number sequence and hit rules are unchanged) ---
+        const feedbackCanvas = document.getElementById('feedbackCanvas');
+        const feedbackCtx = feedbackCanvas.getContext('2d');
+        let connectionEffects = [];
+        let connectionAnimation = null;
+
+        function sizeGameCanvas() {
+            const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.max(1, Math.round(container.clientWidth * pixelRatio));
+            canvas.height = Math.max(1, Math.round(container.clientHeight * pixelRatio));
+            feedbackCanvas.width = canvas.width;
+            feedbackCanvas.height = canvas.height;
+        }
+
+        function updateArcadeMode() {
+            const isMulti = gameMode === 'multi';
+            modeSingleBtn.setAttribute('aria-pressed', String(!isMulti));
+            modeMultiBtn.setAttribute('aria-pressed', String(isMulti));
+            document.getElementById('soloBadge').classList.toggle('hidden', isMulti);
+        }
+
+        function updateArcadeProgress() {
+            const reached = Math.min(balls.length, Math.max(0, targetNumber - 1));
+            document.getElementById('reachedCount').textContent = reached;
+            document.getElementById('goalCount').textContent = balls.length;
+            document.getElementById('rangeLabel').textContent = `1〜${balls.length}`;
+            document.getElementById('hudProgress').style.width = (balls.length ? reached / balls.length * 100 : 0) + '%';
+            canvas.setAttribute('aria-label', `1から${balls.length}までの数字をつなぐ盤面。${reached}こ つながったよ`);
+        }
+
+        function traceConnections() {
+            ctx.beginPath();
+            ctx.moveTo(balls[0].x, balls[0].y);
+            for (let i = 1; i < targetNumber - 1; i++) ctx.lineTo(balls[i].x, balls[i].y);
+        }
+
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+            updateArcadeProgress();
             if (balls.length === 0) return;
-
+            const scale = canvas.width / Math.max(1, container.clientWidth);
             if (targetNumber > 1) {
-                ctx.beginPath();
-                ctx.lineWidth = Math.max(6, balls[0].radius * 0.4);
-                ctx.strokeStyle = '#3b82f6';
+                ctx.save();
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
-                ctx.moveTo(balls[0].x, balls[0].y);
-                for (let i = 1; i < targetNumber - 1; i++) {
-                    ctx.lineTo(balls[i].x, balls[i].y);
-                }
+                ctx.strokeStyle = '#8c72d5';
+                ctx.lineWidth = Math.max(5 * scale, balls[0].radius * .36);
+                ctx.shadowColor = '#b2a0eb';
+                ctx.shadowBlur = 9 * scale;
+                traceConnections();
                 ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = '#e7e1ff';
+                ctx.lineWidth = Math.max(1.5 * scale, balls[0].radius * .09);
+                traceConnections();
+                ctx.stroke();
+                ctx.restore();
             }
-
             if (isDrawing && targetNumber > 1 && targetNumber <= balls.length) {
-                const lastBall = balls[targetNumber - 2];
+                const last = balls[targetNumber - 2];
+                ctx.save();
                 ctx.beginPath();
-                ctx.lineWidth = Math.max(4, balls[0].radius * 0.3);
-                ctx.strokeStyle = 'rgba(59, 130, 246, 0.5)';
-                ctx.setLineDash([10, 10]);
-                ctx.lineCap = 'round';
-                ctx.moveTo(lastBall.x, lastBall.y);
+                ctx.moveTo(last.x, last.y);
                 ctx.lineTo(pointerPos.x, pointerPos.y);
+                ctx.lineWidth = Math.max(2 * scale, last.radius * .08);
+                ctx.strokeStyle = '#9a84cc';
+                ctx.setLineDash([4 * scale, 8 * scale]);
+                ctx.lineCap = 'round';
                 ctx.stroke();
-                ctx.setLineDash([]);
+                ctx.restore();
             }
-
             for (const ball of balls) {
-                const isReached = ball.number < targetNumber;
-                // 次のターゲットの強調をなくすため、isTargetは特別扱いしない
-
+                const reached = ball.number < targetNumber;
+                const r = ball.radius;
+                const depth = Math.min(5 * scale, r * .14);
+                const y = ball.y + (reached ? depth * .48 : 0);
+                ctx.save();
                 ctx.beginPath();
-                // ターゲットでも半径を大きくしない
-                const currentRadius = ball.radius;
-                ctx.arc(ball.x, ball.y, currentRadius, 0, Math.PI * 2);
-
-                if (isReached) {
-                    ctx.fillStyle = '#3b82f6';
-                    ctx.fill();
-                    ctx.strokeStyle = '#1e3a8a';
-                } else {
-                    // まだ到達していないボール（次のターゲットも含む）はすべて同じ見た目にする
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fill();
-                    ctx.strokeStyle = '#94a3b8';
-                }
-                ctx.lineWidth = 2;
+                ctx.arc(ball.x, ball.y + depth, r, 0, Math.PI * 2);
+                ctx.fillStyle = reached ? '#329d94' : '#bcb0d3';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(ball.x, y, r, 0, Math.PI * 2);
+                const face = ctx.createRadialGradient(ball.x - r * .3, y - r * .5, r * .05, ball.x, y, r * 1.3);
+                face.addColorStop(0, reached ? '#b7ffeb' : '#ffffff');
+                face.addColorStop(.62, reached ? '#74ead1' : '#fffcff');
+                face.addColorStop(1, reached ? '#35c6b4' : '#e9e0f8');
+                ctx.fillStyle = face;
+                ctx.shadowColor = '#51416a1a';
+                ctx.shadowBlur = reached ? 0 : 6 * scale;
+                ctx.shadowOffsetY = 2 * scale;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.lineWidth = Math.max(1.2 * scale, Math.min(2.2 * scale, r * .06));
+                ctx.strokeStyle = reached ? '#308e87' : '#82709d';
                 ctx.stroke();
-
-                ctx.fillStyle = isReached ? '#ffffff' : '#475569';
-                ctx.font = `bold ${currentRadius * 1.1}px "M PLUS Rounded 1c", sans-serif`;
+                if (r > 13 * scale) {
+                    ctx.beginPath();
+                    ctx.arc(ball.x, y, r - 4 * scale, Math.PI * 1.12, Math.PI * 1.88);
+                    ctx.strokeStyle = '#ffffffbb';
+                    ctx.lineWidth = 2 * scale;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
+                ctx.fillStyle = reached ? '#204d50' : '#372d52';
+                ctx.font = `700 ${r * 1.05}px "M PLUS Rounded 1c", sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(ball.number, ball.x, ball.y + currentRadius * 0.05); 
+                ctx.fillText(ball.number, ball.x, y + r * .035);
+                ctx.restore();
             }
+        }
+
+        function clearConnectionEffects() {
+            if (connectionAnimation !== null) cancelAnimationFrame(connectionAnimation);
+            connectionAnimation = null;
+            connectionEffects = [];
+            feedbackCtx.clearRect(0, 0, feedbackCanvas.width, feedbackCanvas.height);
+        }
+
+        function celebrateConnection(ball) {
+            if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+            connectionEffects.push({ x: ball.x, y: ball.y, r: ball.radius, start: performance.now() });
+            if (connectionAnimation === null) connectionAnimation = requestAnimationFrame(animateConnectionEffects);
+        }
+
+        function animateConnectionEffects(now) {
+            feedbackCtx.clearRect(0, 0, feedbackCanvas.width, feedbackCanvas.height);
+            connectionEffects = connectionEffects.filter(effect => now - effect.start < 480);
+            for (const effect of connectionEffects) {
+                const p = Math.max(0, (now - effect.start) / 480);
+                const distance = effect.r * (1.12 + p * .7);
+                feedbackCtx.save();
+                feedbackCtx.globalAlpha = (1 - p) * .8;
+                feedbackCtx.beginPath();
+                feedbackCtx.arc(effect.x, effect.y, distance, 0, Math.PI * 2);
+                feedbackCtx.strokeStyle = '#55c6b5';
+                feedbackCtx.lineWidth = Math.max(1, effect.r * .035);
+                feedbackCtx.stroke();
+                for (let i = 0; i < 8; i++) {
+                    const angle = i * Math.PI / 4;
+                    const x = effect.x + Math.cos(angle) * distance;
+                    const y = effect.y + Math.sin(angle) * distance;
+                    const size = effect.r * .12 * (1 - p * .5);
+                    feedbackCtx.beginPath();
+                    feedbackCtx.moveTo(x, y - size);
+                    feedbackCtx.lineTo(x + size * .5, y);
+                    feedbackCtx.lineTo(x, y + size);
+                    feedbackCtx.lineTo(x - size * .5, y);
+                    feedbackCtx.closePath();
+                    feedbackCtx.fillStyle = i % 2 ? '#b399e3' : '#e6ae3d';
+                    feedbackCtx.fill();
+                }
+                feedbackCtx.restore();
+            }
+            connectionAnimation = connectionEffects.length ? requestAnimationFrame(animateConnectionEffects) : null;
         }
 
         // --- インタラクション ---
@@ -843,6 +1251,7 @@
                     startTimer();
                 }
 
+                celebrateConnection(targetBall);
                 speakNumber(targetNumber);
 
                 targetNumber++;
@@ -864,7 +1273,7 @@
                 clientX = e.touches[0].clientX;
                 clientY = e.touches[0].clientY;
             }
-            return { x: clientX - rect.left, y: clientY - rect.top };
+            return { x: (clientX - rect.left) * canvas.width / rect.width, y: (clientY - rect.top) * canvas.height / rect.height };
         }
 
         function handlePointerDown(e) {
@@ -906,34 +1315,23 @@
             isDrawingAllowed = false;
             isDrawing = false;
             draw();
-            
             finalTime = stopTimer();
 
-            // ゴール時の音声を再生
-            playBuffer('goal');
-            
-            // ★ yokudekimashita.mp3 は「ひとりで」モード限定
+            // 最後の数字に触れた瞬間に、画面全体のクリア演出を開始。
+            startConfetti();
             if (gameMode === 'single') {
-                playBuffer('yokudekimashita');
-            }
-
-            if (gameMode === 'single') {
-                setTimeout(() => {
-                    singleClearOverlay.classList.remove('hidden');
-                    document.getElementById('singleClearTime').innerText = `タイム: ${finalTime.toFixed(2)}秒`;
-                    requestAnimationFrame(() => {
-                        singleClearOverlay.classList.remove('opacity-0');
-                        singleClearOverlay.classList.add('opacity-100');
-                    });
-                    startConfetti();
-                }, 300);
-            } else if (gameMode === 'multi') {
+                singleClearOverlay.classList.remove('hidden', 'opacity-0');
+                singleClearOverlay.classList.add('opacity-100');
+                document.getElementById('singleClearTime').innerText = `タイム: ${finalTime.toFixed(2)}秒`;
+                scheduleVictoryTask(() => {
+                    const voice = playBuffer('yokudekimashita');
+                    if (voice) victorySoundNodes.push(voice);
+                },1650);
+            } else {
                 sendClearTime(finalTime);
-                startConfetti();
-                
                 const msg = document.getElementById('centerMessageText');
-                msg.innerText = 'たいきちゅう...';
-                msg.className = 'text-4xl sm:text-6xl font-bold text-blue-500 drop-shadow-lg bg-white/80 px-6 py-2 rounded-full border-4 border-blue-200';
+                msg.innerText = 'ゴール！ みんなを まってね';
+                msg.className = 'text-3xl sm:text-5xl font-bold text-blue-500 drop-shadow-lg bg-white/90 px-5 py-3 rounded-full border-4 border-blue-200 text-center';
                 centerMessage.classList.remove('hidden');
             }
         }
@@ -965,11 +1363,13 @@
         });
 
         modeMultiBtn.addEventListener('click', () => {
+            if (gameMode === 'multi') return;
             if (!isFirebaseReady) {
                 alert("通信の準備ができていません。インターネットにつながっているか確認してください。");
                 return;
             }
             gameMode = 'multi';
+            updateArcadeMode();
             modeSingleBtn.classList.replace('bg-white', 'text-blue-500');
             modeSingleBtn.classList.replace('text-blue-600', 'hover:text-blue-600');
             modeSingleBtn.classList.remove('shadow');
@@ -982,6 +1382,8 @@
             multiStatusUI.classList.remove('hidden');
             multiStatusUI.classList.add('flex');
 
+            isDrawingAllowed = false;
+            isDrawing = false;
             resetTimer();
             stopConfetti();
             ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -996,8 +1398,8 @@
         });
 
         modeSingleBtn.addEventListener('click', () => {
-            if (roomUnsubscribe) roomUnsubscribe();
-            currentRoomId = null;
+            // タブから戻る場合も担当者を次の参加者へ引き継ぐ。
+            leaveCurrentRoom();
             
             modeMultiBtn.classList.replace('bg-white', 'text-blue-500');
             modeMultiBtn.classList.replace('text-blue-600', 'hover:text-blue-600');
@@ -1025,82 +1427,67 @@
             const roomId = document.getElementById('roomWordInput').value.trim();
             const playerName = document.getElementById('playerNameInput').value.trim();
             const errorMsg = document.getElementById('setupErrorMsg');
-            
+            const btn = document.getElementById('joinRoomBtn');
+            if (btn.disabled) return;
             if (!roomId || !playerName) {
-                errorMsg.innerText = "あいことば と なまえ を いれてね！";
+                errorMsg.textContent = 'あいことば と なまえ を いれてね！';
                 errorMsg.classList.remove('hidden');
                 return;
             }
-
+            if (roomId.includes('/')) {
+                errorMsg.textContent = 'あいことばに / は つかえません';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            btn.disabled = true;
+            btn.textContent = 'つうしんちゅう...';
+            errorMsg.classList.add('hidden');
             try {
-                const btn = document.getElementById('joinRoomBtn');
-                btn.disabled = true;
-                btn.innerText = "つうしんちゅう...";
-
-                currentRoomId = roomId;
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-                const docSnap = await getDoc(roomRef);
-                
-                const currentCount = parseInt(ballCountInput.value, 10) || 10;
-                const now = new Date().getTime();
-
-                if (!docSnap.exists()) {
-                    await setDoc(roomRef, {
-                        state: 'waiting',
-                        ballCount: currentCount,
-                        ballLayout: [],
-                        lastActivity: now,
-                        players: {
-                            [currentUserId]: { name: playerName, progress: 0, time: null }
-                        }
-                    });
-                } else {
-                    const data = docSnap.data();
-                    const players = data.players || {};
-                    const playerCount = Object.keys(players).length;
-                    const lastAct = data.lastActivity || 0;
-                    
-                    const amIInRoom = !!players[currentUserId];
-                    const isGhostRoom = (data.state === 'playing') && (playerCount === 0 || amIInRoom || (now - lastAct > 60000));
-                    const canJoin = data.state === 'waiting' || data.state === 'finished' || isGhostRoom;
-
-                    if (!canJoin) {
-                        btn.disabled = false;
-                        btn.innerText = "へやに はいる";
-                        errorMsg.innerText = "そのへやは もう ゲームが はじまっています！";
-                        errorMsg.classList.remove('hidden');
+                const currentCount = validateBallCount();
+                await runTransaction(db, async transaction => {
+                    const snapshot = await transaction.get(roomRef);
+                    const player = { name: playerName, progress: 0, time: null };
+                    if (!snapshot.exists() || getPlayerOrder(snapshot.data()).length === 0) {
+                        transaction.set(roomRef, {
+                            state: 'waiting', ballCount: currentCount, ballLayout: [],
+                            lastActivity: Date.now(), roundId: 0,
+                            settingsOwnerId: currentUserId, nextSettingsOwnerId: null,
+                            playerOrder: [currentUserId], players: { [currentUserId]: player }
+                        });
                         return;
                     }
-
-                    const updates = {
-                        [`players.${currentUserId}`]: { name: playerName, progress: 0, time: null },
-                        lastActivity: now
-                    };
-                    
-                    if (data.state === 'finished' || isGhostRoom) {
-                        updates.state = 'waiting';
-                        Object.keys(players).forEach(uid => {
-                            if (uid !== currentUserId) updates[`players.${uid}`] = deleteField();
-                        });
+                    const data = snapshot.data();
+                    const alreadyJoined = !!data.players?.[currentUserId];
+                    // ゆっくり考えている部屋や、再接続した部屋をリセットしない。
+                    if (data.state === 'playing' && !alreadyJoined) {
+                        throw new Error('そのへやは もう ゲームが はじまっています！');
                     }
-
-                    await updateDoc(roomRef, updates);
-                }
-
-                btn.disabled = false;
-                btn.innerText = "へやに はいる";
-                
-                document.getElementById('currentRoomDisplay').innerText = roomId;
-                document.getElementById('waitingRoomWord').innerText = roomId;
+                    const order = getPlayerOrder(data);
+                    if (!alreadyJoined) order.push(currentUserId);
+                    const updates = {
+                        playerOrder: order, settingsOwnerId: getSettingsOwner(data),
+                        ballCount: normalizeBallCount(data.ballCount), lastActivity: Date.now()
+                    };
+                    if (!alreadyJoined) updates[`players.${currentUserId}`] = player;
+                    else updates[`players.${currentUserId}.name`] = playerName;
+                    // 終了直後の入室でも、既存参加者や今回の担当者は保持する。
+                    transaction.update(roomRef, updates);
+                });
+                currentRoomId = roomId;
+                document.getElementById('currentRoomDisplay').textContent = roomId;
+                document.getElementById('waitingRoomWord').textContent = roomId;
+                showMultiSettingsError();
                 showModal('roomWaitingUI');
                 listenRoom();
-
             } catch(e) {
                 console.error(e);
-                errorMsg.innerText = "エラーがおきました。もういちど ためしてね。";
+                errorMsg.textContent = e.message === 'そのへやは もう ゲームが はじまっています！'
+                    ? e.message : 'エラーがおきました。もういちど ためしてね。';
                 errorMsg.classList.remove('hidden');
-                document.getElementById('joinRoomBtn').disabled = false;
-                document.getElementById('joinRoomBtn').innerText = "へやに はいる";
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'へやに はいる';
             }
         });
 
@@ -1110,24 +1497,35 @@
             if (roomUnsubscribe) roomUnsubscribe();
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
             
-            roomPreviousState = 'waiting';
+            roomPreviousState = '';
             
             roomUnsubscribe = onSnapshot(roomRef, (snapshot) => {
                 if (!snapshot.exists()) return;
                 const data = snapshot.data();
                 const playersData = data.players || {};
+                currentRoomData = data;
+                updateRoomSettings(data);
                 
                 if (data.state === 'waiting') {
                     updateWaitingList(playersData);
-                    if (roomPreviousState === 'finished') {
+                    if (roomPreviousState !== 'waiting') {
+                        clearInterval(multiCountdownInterval);
+                        clearTimeout(progressTimeout);
+                        progressTimeout = null;
+                        centerMessage.classList.add('hidden');
+                        stopConfetti();
+                        resetTimer();
+                        isDrawingAllowed = false;
+                        showMultiSettingsError();
                         showModal('roomWaitingUI');
                     }
                 }
 
-                if (roomPreviousState === 'waiting' && data.state === 'playing') {
+                if (roomPreviousState !== 'playing' && data.state === 'playing') {
                     hideModal();
                     applyBallsData(data.ballLayout);
-                    targetNumber = 1;
+                    targetNumber = Math.min(balls.length + 1, (playersData[currentUserId]?.progress || 0) + 1);
+                    isDrawing = false;
                     
                     // ★ マルチプレイ専用UIを表示する
                     document.getElementById('multiRankUI').classList.remove('hidden');
@@ -1141,12 +1539,16 @@
                     updateMultiplayerStatus(playersData, data.ballCount);
                     
                     const allCleared = Object.values(playersData).every(p => p.time !== null);
-                    if (allCleared && Object.keys(playersData)[0] === currentUserId) {
-                        updateDoc(roomRef, { state: 'finished' });
+                    if (allCleared && getSettingsOwner(data) === currentUserId) {
+                        finishRoomIfCleared(roomRef, data.roundId || 0);
                     }
                 }
 
-                if (roomPreviousState === 'playing' && data.state === 'finished') {
+                if (roomPreviousState !== 'finished' && data.state === 'finished') {
+                    clearInterval(multiCountdownInterval);
+                    isDrawingAllowed = false;
+                    isDrawing = false;
+                    stopTimer();
                     centerMessage.classList.add('hidden');
                     stopConfetti();
                     showResult(playersData);
@@ -1160,18 +1562,45 @@
             });
         }
 
+        async function finishRoomIfCleared(roomRef, roundId) {
+            try {
+                await runTransaction(db, async transaction => {
+                    const snapshot = await transaction.get(roomRef);
+                    if (!snapshot.exists()) return;
+                    const data = snapshot.data();
+                    const players = Object.values(data.players || {});
+                    if (data.state === 'playing' && (data.roundId || 0) === roundId &&
+                        players.length > 0 && players.every(player => player.time !== null)) {
+                        transaction.update(roomRef, { state: 'finished', lastActivity: Date.now() });
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
         function updateWaitingList(players) {
             const listDiv = document.getElementById('playersList');
-            listDiv.innerHTML = '';
-            Object.keys(players).forEach(uid => {
-                const p = players[players];
-                const div = document.createElement('div');
-                div.className = `p-2 rounded-lg font-bold flex items-center gap-2 ${uid === currentUserId ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-white text-slate-700'}`;
-                div.innerHTML = `
-                    <span class="text-xl">${uid === currentUserId ? '👤' : '🤖'}</span>
-                    ${players[uid].name} ${uid === currentUserId ? '<span class="text-xs text-blue-500">(あなた)</span>' : ''}
-                `;
-                listDiv.appendChild(div);
+            listDiv.replaceChildren();
+            const ownerId = currentRoomData ? getSettingsOwner(currentRoomData) : null;
+            const order = currentRoomData ? getPlayerOrder(currentRoomData) : Object.keys(players);
+            order.forEach(uid => {
+                const player = players[uid];
+                const row = document.createElement('div');
+                row.className = 'player-row' + (uid === currentUserId ? ' is-me' : '');
+                const avatar = document.createElement('span');
+                avatar.className = 'player-avatar';
+                avatar.setAttribute('aria-hidden', 'true');
+                avatar.textContent = Array.from(player.name || '★')[0];
+                const name = document.createElement('span');
+                name.className = 'player-name';
+                name.textContent = player.name + (uid === currentUserId ? '（あなた）' : '');
+                row.append(avatar, name);
+                if (uid === ownerId) {
+                    const badge = document.createElement('span');
+                    badge.className = 'player-tag';
+                    badge.textContent = 'かずを きめる';
+                    row.appendChild(badge);
+                }
+                listDiv.appendChild(row);
             });
         }
 
@@ -1233,35 +1662,75 @@
             });
         }
 
-        document.getElementById('startMultiBtn').addEventListener('click', async () => {
-            if (!currentRoomId) return;
-            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
-            const docSnap = await getDoc(roomRef);
-            if (!docSnap.exists()) return;
-            
-            const data = docSnap.data();
-            const updates = { 
-                state: 'playing',
-                lastActivity: new Date().getTime()
-            };
-            Object.keys(data.players).forEach(uid => {
-                updates[`players.${uid}.progress`] = 0;
-                updates[`players.${uid}.time`] = null;
-            });
-            
-            updates.ballLayout = generateBallsData(data.ballCount);
-            
-            await updateDoc(roomRef, updates);
+        multiBallCountInput.addEventListener('change', async () => {
+            const count = normalizeBallCount(multiBallCountInput.value);
+            multiBallCountInput.value = count;
+            if (!currentRoomId || roomActionPending) return;
+            const roomId = currentRoomId;
+            const roundId = currentRoomData?.roundId || 0;
+            showMultiSettingsError();
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                await runTransaction(db, async transaction => {
+                    const snapshot = await transaction.get(roomRef);
+                    if (!snapshot.exists()) return;
+                    const data = snapshot.data();
+                    if (data.state !== 'waiting' || (data.roundId || 0) !== roundId || getSettingsOwner(data) !== currentUserId) return;
+                    transaction.update(roomRef, { ballCount: count, lastActivity: Date.now() });
+                });
+            } catch(e) {
+                console.error(e);
+                if (currentRoomId === roomId) showMultiSettingsError('かずを ほぞんできませんでした。もういちど ためしてね。');
+            } finally {
+                if (currentRoomId === roomId && currentRoomData) updateRoomSettings(currentRoomData);
+            }
+        });
+
+        startMultiBtn.addEventListener('click', async () => {
+            if (!currentRoomId || roomActionPending) return;
+            const roomId = currentRoomId;
+            const roundId = currentRoomData?.roundId || 0;
+            const count = normalizeBallCount(multiBallCountInput.value);
+            roomActionPending = true;
+            showMultiSettingsError();
+            if (currentRoomData) updateRoomSettings(currentRoomData);
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                await runTransaction(db, async transaction => {
+                    const snapshot = await transaction.get(roomRef);
+                    if (!snapshot.exists()) return;
+                    const data = snapshot.data();
+                    if (data.state !== 'waiting' || (data.roundId || 0) !== roundId || getSettingsOwner(data) !== currentUserId) return;
+                    const updates = {
+                        state: 'playing', ballCount: count,
+                        ballLayout: generateBallsData(count),
+                        roundId: (data.roundId || 0) + 1,
+                        playerOrder: getPlayerOrder(data), settingsOwnerId: currentUserId,
+                        nextSettingsOwnerId: null, lastActivity: Date.now()
+                    };
+                    Object.keys(data.players || {}).forEach(uid => {
+                        updates[`players.${uid}.progress`] = 0;
+                        updates[`players.${uid}.time`] = null;
+                    });
+                    transaction.update(roomRef, updates);
+                });
+            } catch(e) {
+                console.error(e);
+                if (currentRoomId === roomId) showMultiSettingsError('スタートできませんでした。もういちど ためしてね。');
+            } finally {
+                roomActionPending = false;
+                if (currentRoomId === roomId && currentRoomData) updateRoomSettings(currentRoomData);
+            }
         });
 
         function startMultiCountdown() {
+            clearInterval(multiCountdownInterval);
             isDrawingAllowed = false;
             resetTimer();
             gameOverlayUI.classList.remove('opacity-0');
             gameOverlayUI.classList.add('opacity-100');
             
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
+            sizeGameCanvas();
             applyBallsData(ballsData);
             draw();
 
@@ -1279,7 +1748,7 @@
             // ★ 待機中に眠ってしまった音声エンジンを叩き起こす
             wakeupVoice();
 
-            const interval = setInterval(() => {
+            multiCountdownInterval = setInterval(() => {
                 count--;
                 if (count > 0) {
                     msgText.innerText = count;
@@ -1288,64 +1757,86 @@
                     msgText.innerText = 'スタート！';
                     msgText.classList.remove('animate-bounce');
                     playStartWhistle(); // ★ スタート！のホイッスル音
+                    isDrawingAllowed = true;
+                    startTimer();
                     
                     // ★ ゲーム開始直前にもう一度確実に起こしておく
                     wakeupVoice();
                 } else {
-                    clearInterval(interval);
+                    clearInterval(multiCountdownInterval);
+                    multiCountdownInterval = null;
                     msgDiv.classList.add('hidden');
-                    isDrawingAllowed = true;
-                    startTimer();
                 }
             }, 1000);
         }
 
         let progressTimeout = null;
         let pendingProgress = -1;
+
+        async function writePlayerProgress(roomId, roundId, progress, time = null) {
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+            await runTransaction(db, async transaction => {
+                const snapshot = await transaction.get(roomRef);
+                if (!snapshot.exists()) return;
+                const data = snapshot.data();
+                if (data.state !== 'playing' || (data.roundId || 0) !== roundId || !data.players?.[currentUserId]) return;
+                // 完了済みの記録を、遅れて届いた途中経過で巻き戻さない。
+                if (data.players[currentUserId].time !== null) return;
+                const updates = {
+                    [`players.${currentUserId}.progress`]: Math.min(normalizeBallCount(data.ballCount), Math.max(0, progress)),
+                    lastActivity: Date.now()
+                };
+                if (time !== null) updates[`players.${currentUserId}.time`] = time;
+                transaction.update(roomRef, updates);
+            });
+        }
+
         function sendProgressThrottled(prog) {
             pendingProgress = prog;
-            if (!progressTimeout) {
+            if (!progressTimeout && currentRoomId) {
+                const roomId = currentRoomId;
+                const roundId = currentRoomData?.roundId || 0;
                 progressTimeout = setTimeout(async () => {
                     progressTimeout = null;
-                    if (!currentRoomId) return;
+                    const progress = pendingProgress;
+                    if (currentRoomId !== roomId) return;
                     try {
-                        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
-                        await updateDoc(roomRef, {
-                            [`players.${currentUserId}.progress`]: pendingProgress,
-                            lastActivity: new Date().getTime()
-                        });
+                        await writePlayerProgress(roomId, roundId, progress);
                     } catch(e) { console.error(e); }
-                }, 400); 
+                }, 400);
             }
         }
 
         async function sendClearTime(time) {
             if (!currentRoomId) return;
+            clearTimeout(progressTimeout);
+            progressTimeout = null;
             try {
-                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
-                await updateDoc(roomRef, {
-                    [`players.${currentUserId}.progress`]: balls.length,
-                    [`players.${currentUserId}.time`]: time,
-                    lastActivity: new Date().getTime()
-                });
+                await writePlayerProgress(currentRoomId, currentRoomData?.roundId || 0, balls.length, time);
             } catch(e) { console.error(e); }
         }
 
         document.getElementById('backToWaitingBtn').addEventListener('click', async () => {
-            if (!currentRoomId) return;
+            if (!currentRoomId || roomActionPending) return;
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+            const roundId = currentRoomData?.roundId || 0;
+            roomActionPending = true;
             try {
-                const docSnap = await getDoc(roomRef);
-                if (docSnap.exists() && docSnap.data().state === 'finished') {
-                    const data = docSnap.data();
-                    const updates = { state: 'waiting', lastActivity: new Date().getTime() };
-                    Object.keys(data.players).forEach(uid => {
-                        updates[`players.${uid}.progress`] = 0;
-                        updates[`players.${uid}.time`] = null;
-                    });
-                    await updateDoc(roomRef, updates);
-                }
-            } catch(e) { console.error(e); }
+                await runTransaction(db, async transaction => {
+                    const snapshot = await transaction.get(roomRef);
+                    if (!snapshot.exists()) return;
+                    const data = snapshot.data();
+                    if (data.state !== 'finished' || (data.roundId || 0) !== roundId || !data.players?.[currentUserId]) return;
+                    // 状態の確認と担当の交代を一括で行い、同時クリックでも一度だけ交代する。
+                    transaction.update(roomRef, nextRoundUpdates(data));
+                });
+            } catch(e) {
+                console.error(e);
+                showAlert('たいきしつに もどれませんでした。もういちど ためしてね。');
+            } finally {
+                roomActionPending = false;
+                if (currentRoomData) updateRoomSettings(currentRoomData);
+            }
         });
 
         function showResult(players) {
@@ -1357,14 +1848,7 @@
                 return a.time - b.time;
             });
             
-            // ★ 勝敗判定：自分が1位（かつクリア済み）ならwin、それ以外はloseを再生
-            if (list.length > 0) {
-                if (list[0].uid === currentUserId && list[0].time !== null) {
-                    playBuffer('win');
-                } else {
-                    playBuffer('lose');
-                }
-            }
+            const isWinner = list.length > 0 && list[0].uid === currentUserId && list[0].time !== null;
 
             const listDiv = document.getElementById('resultList');
             listDiv.innerHTML = '';
@@ -1393,44 +1877,65 @@
                 listDiv.appendChild(div);
             });
 
-            startConfetti();
+            startConfetti({
+                title: isWinner ? 'ゆうしょう！' : 'ナイスプレイ！',
+                subtitle: isWinner ? '1い おめでとう！' : 'さいごまで よくがんばった！'
+            });
             showModal('roomResultUI');
         }
 
         async function leaveCurrentRoom() {
-            if (currentRoomId && currentUserId && isFirebaseReady) {
-                try {
-                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
-                    const docSnap = await getDoc(roomRef);
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        const players = data.players || {};
-                        const updates = {
-                            [`players.${currentUserId}`]: deleteField(),
-                            lastActivity: new Date().getTime()
-                        };
-                        
-                        if (Object.keys(players).length <= 1) {
-                            updates.state = 'waiting';
-                        }
-                        
-                        await updateDoc(roomRef, updates);
+            const roomId = currentRoomId;
+            if (roomUnsubscribe) roomUnsubscribe();
+            roomUnsubscribe = null;
+            currentRoomId = null;
+            currentRoomData = null;
+            clearInterval(multiCountdownInterval);
+            multiCountdownInterval = null;
+            clearTimeout(progressTimeout);
+            progressTimeout = null;
+            pendingProgress = -1;
+            isDrawingAllowed = false;
+            isDrawing = false;
+            if (!roomId || !currentUserId || !isFirebaseReady) return;
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                await runTransaction(db, async transaction => {
+                    const snapshot = await transaction.get(roomRef);
+                    if (!snapshot.exists()) return;
+                    const data = snapshot.data();
+                    if (!data.players?.[currentUserId]) return;
+                    const oldOrder = getPlayerOrder(data);
+                    const order = oldOrder.filter(uid => uid !== currentUserId);
+                    const ownerId = getSettingsOwner(data);
+                    const successor = oldOrder[(oldOrder.indexOf(currentUserId) + 1) % oldOrder.length];
+                    const newOwnerId = ownerId === currentUserId ? (order.includes(successor) ? successor : order[0] || null) : ownerId;
+                    const updates = {
+                        [`players.${currentUserId}`]: deleteField(),
+                        playerOrder: order, settingsOwnerId: newOwnerId,
+                        lastActivity: Date.now()
+                    };
+                    // プレイ中に担当者が抜けたときは、次の担当者を再戦時に飛ばさない。
+                    if (data.state !== 'waiting' && (ownerId === currentUserId || data.nextSettingsOwnerId === currentUserId)) {
+                        updates.nextSettingsOwnerId = newOwnerId;
                     }
-                } catch(e) {
-                    console.error("へやからの退出にしっぱいしました", e);
-                }
+                    if (order.length === 0) {
+                        updates.state = 'waiting';
+                        updates.nextSettingsOwnerId = null;
+                        updates.ballLayout = [];
+                    } else if (data.state === 'playing' && order.every(uid => data.players[uid].time !== null)) {
+                        updates.state = 'finished';
+                    }
+                    transaction.update(roomRef, updates);
+                });
+            } catch(e) {
+                console.error('へやからの退出にしっぱいしました', e);
             }
         }
 
-        document.getElementById('leaveRoomBtn').addEventListener('click', async () => {
-            await leaveCurrentRoom();
-            modeSingleBtn.click();
-        });
-        
-        cancelWaitingBtn.addEventListener('click', async () => {
-            await leaveCurrentRoom();
-            modeSingleBtn.click();
-        });
+        document.getElementById('leaveRoomBtn').addEventListener('click', () => modeSingleBtn.click());
+        cancelWaitingBtn.addEventListener('click', () => modeSingleBtn.click());
+
 
 
         // ==========================================
@@ -1458,7 +1963,7 @@
                 wakeupVoice();
             }
             
-            const currentCount = parseInt(ballCountInput.value, 10) || 10;
+            const currentCount = validateBallCount();
             if (currentCount !== previousBallCount) {
                 previousBallCount = currentCount;
                 if (gameMode === 'single') initSingleGame();
@@ -1466,7 +1971,7 @@
         }
 
         openSettingsBtn.addEventListener('click', () => {
-            previousBallCount = parseInt(ballCountInput.value, 10) || 10;
+            previousBallCount = validateBallCount();
             showModal('settingsUI');
         });
 
@@ -1474,8 +1979,8 @@
         applySettingsBtn.addEventListener('click', closeSettings);
         
         function resizeCanvasAndDraw() {
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
+            sizeGameCanvas();
+            clearConnectionEffects();
             if (ballsData && ballsData.length > 0) {
                 applyBallsData(ballsData);
                 draw();
@@ -1504,13 +2009,9 @@
         document.getElementById('nextBtn').addEventListener('click', initSingleGame);
         
         function validateBallCount() {
-            let val = parseInt(ballCountInput.value, 10);
-            if (val > 100) {
-                alert("100までのかずにしてください");
-                ballCountInput.value = 100;
-            } else if (val < 2 || isNaN(val)) {
-                ballCountInput.value = 2;
-            }
+            const count = normalizeBallCount(ballCountInput.value);
+            ballCountInput.value = count;
+            return count;
         }
 
         ballCountInput.addEventListener('change', validateBallCount);
@@ -1530,67 +2031,208 @@
             }, 200);
         });
 
-        // ==========================================
-        // 紙吹雪エフェクト
-        // ==========================================
+        // The finish is a short full-screen show, not confetti behind a modal.
         const confettiCanvas = document.getElementById('confettiCanvas');
         const confettiCtx = confettiCanvas.getContext('2d');
+        const victoryShow = document.getElementById('victoryShow');
         let confettis = [];
-        let confettiAnimationId;
+        let confettiAnimationId = null;
+        let victoryTimers = [];
+        let victorySoundNodes = [];
+        let victoryStartedAt = 0;
+        let victoryPreviousFrame = 0;
+        let victoryBurstIndex = 0;
+        let victoryRunning = false;
+        let victorySize = { width: 1, height: 1, ratio: 1 };
+        const victoryBurstTimes = [0, 0, 450, 950, 1500, 2350, 3200];
+        const victoryColors = ['#ffe76c', '#ff79b7', '#73ffe1', '#c5a2ff', '#ffffff', '#ffa65b'];
 
-        function startConfetti() {
-            confettiCanvas.width = container.clientWidth;
-            confettiCanvas.height = container.clientHeight;
-            confettis = [];
-            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d', '#42a5f5', '#66bb6a', '#ffb74d'];
-            
-            for (let i = 0; i < 150; i++) {
-                confettis.push({
-                    x: Math.random() * confettiCanvas.width,
-                    y: Math.random() * confettiCanvas.height - confettiCanvas.height,
-                    w: Math.random() * 10 + 8,
-                    h: Math.random() * 10 + 8,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    vy: Math.random() * 3 + 2,
-                    vx: Math.random() * 4 - 2,
-                    rot: Math.random() * 360,
-                    rotSpeed: Math.random() * 10 - 5
-                });
-            }
-            cancelAnimationFrame(confettiAnimationId);
-            animateConfetti();
+        function scheduleVictoryTask(callback, delay) {
+            const id = setTimeout(() => {
+                victoryTimers = victoryTimers.filter(timer => timer !== id);
+                callback();
+            }, delay);
+            victoryTimers.push(id);
         }
 
-        function animateConfetti() {
-            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-            let allFallen = true;
-            
-            for (let i = 0; i < confettis.length; i++) {
-                let p = confettis[i];
-                confettiCtx.save();
-                confettiCtx.translate(p.x + p.w/2, p.y + p.h/2);
-                confettiCtx.rotate(p.rot * Math.PI / 180);
-                confettiCtx.fillStyle = p.color;
-                confettiCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-                confettiCtx.restore();
-                
-                p.y += p.vy;
-                p.x += p.vx;
-                p.rot += p.rotSpeed;
-                
-                if (p.y < confettiCanvas.height + 20) {
-                    allFallen = false;
+        function resizeVictoryCanvas() {
+            const width = window.innerWidth || container.clientWidth;
+            const height = window.innerHeight || container.clientHeight;
+            const ratio = Math.min(window.devicePixelRatio || 1, 2);
+            if (width !== victorySize.width || height !== victorySize.height || ratio !== victorySize.ratio) {
+                confettis.forEach(p => { p.x *= width / victorySize.width; p.y *= height / victorySize.height; });
+                victorySize = { width, height, ratio };
+                confettiCanvas.width = Math.round(width * ratio);
+                confettiCanvas.height = Math.round(height * ratio);
+            }
+            confettiCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        }
+
+        function playVictoryFanfare() {
+            if (!isSoundEffectsEnabled || !audioCtx || typeof audioCtx.createOscillator !== 'function') return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            function note(frequency, offset, duration, volume, type = 'triangle') {
+                const oscillator = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, now + offset);
+                gain.gain.setValueAtTime(0, now + offset);
+                gain.gain.linearRampToValueAtTime(volume, now + offset + .015);
+                gain.gain.exponentialRampToValueAtTime(.001, now + offset + duration);
+                oscillator.connect(gain);
+                gain.connect(audioCtx.destination);
+                oscillator.start(now + offset);
+                oscillator.stop(now + offset + duration + .03);
+                victorySoundNodes.push(oscillator);
+            }
+            // Bright ascending brass/chimes followed by a sustained major chord.
+            [[523.25,0],[659.25,.12],[783.99,.24],[1046.5,.42],[783.99,.64],[1046.5,.8]].forEach(([frequency,offset]) => {
+                note(frequency, offset, .3, .043);
+                note(frequency * 2, offset, .42, .012, 'sine');
+            });
+            [523.25,659.25,783.99,1046.5].forEach(frequency => note(frequency,.98,.85,.023));
+            [[130.81,0],[196,.24],[261.63,.42],[130.81,.98]].forEach(([frequency,offset]) => note(frequency,offset,.45,.045));
+        }
+
+        function emitVictoryBurst(index, now) {
+            const { width:w, height:h } = victorySize;
+            const unit = Math.max(.7, Math.min(1.5, w / 750));
+            const compact = w < 600;
+            const spawn = (x, y, angle, spread, count, speed, kind) => {
+                for (let i = 0; i < count; i++) {
+                    const direction = angle + (Math.random() - .5) * spread;
+                    const velocity = speed * (.45 + Math.random() * .7) * unit;
+                    confettis.push({
+                        x, y, vx:Math.cos(direction) * velocity, vy:Math.sin(direction) * velocity,
+                        size:(7 + Math.random() * 11) * unit,
+                        color:victoryColors[Math.floor(Math.random() * victoryColors.length)],
+                        rotation:Math.random() * Math.PI * 2, spin:(Math.random() - .5) * 10,
+                        birth:now, life:1800 + Math.random() * 1900,
+                        kind:kind || (i % 4 === 0 ? 'star' : i % 3 === 0 ? 'spark' : 'ribbon'),
+                        gravity:kind === 'star' ? 130 : 270 + Math.random() * 160
+                    });
                 }
+            };
+            if (index === 0) spawn(w * .5,h * .48,0,Math.PI * 2,compact ? 54 : 90,560,'star');
+            else if (index === 1 || index === 4) {
+                spawn(w * .02,h * .88,-Math.PI * .32,.65,compact ? 42 : 65,900);
+                spawn(w * .98,h * .88,-Math.PI * .68,.65,compact ? 42 : 65,900);
+            } else {
+                const x = index % 2 ? w * .75 : w * .25;
+                const y = index === 6 ? h * .3 : h * .35;
+                spawn(x,y,0,Math.PI * 2,compact ? 38 : 65,310,index % 2 ? 'star' : null);
             }
-            if (!allFallen) {
-                confettiAnimationId = requestAnimationFrame(animateConfetti);
+            const cap = compact ? 240 : 380;
+            if (confettis.length > cap) confettis.splice(0, confettis.length - cap);
+        }
+
+        function victoryStarPath(context, radius) {
+            context.beginPath();
+            for (let i = 0; i < 10; i++) {
+                const angle = -Math.PI / 2 + i * Math.PI / 5;
+                const r = i % 2 ? radius * .43 : radius;
+                if (i === 0) context.moveTo(Math.cos(angle) * r,Math.sin(angle) * r);
+                else context.lineTo(Math.cos(angle) * r,Math.sin(angle) * r);
             }
+            context.closePath();
+        }
+
+        function animateConfetti(now = performance.now()) {
+            if (!victoryRunning) return;
+            resizeVictoryCanvas();
+            const {width:w,height:h} = victorySize;
+            const age = now - victoryStartedAt;
+            const dt = Math.min(.04, Math.max(0, (now - victoryPreviousFrame) / 1000));
+            victoryPreviousFrame = now;
+            confettiCtx.clearRect(0,0,w,h);
+            while (victoryBurstIndex < victoryBurstTimes.length && age >= victoryBurstTimes[victoryBurstIndex]) {
+                emitVictoryBurst(victoryBurstIndex++, now);
+            }
+            // One expanding impact ring; no repeated flashes or strobing.
+            if (age < 850) {
+                const p = age / 850;
+                confettiCtx.save();
+                confettiCtx.globalAlpha = (1 - p) * .8;
+                confettiCtx.strokeStyle = '#fff1a0';
+                confettiCtx.lineWidth = 5 * (1 - p) + 1;
+                confettiCtx.beginPath();
+                confettiCtx.arc(w * .5,h * .48,Math.max(1, Math.hypot(w,h) * .6 * p),0,Math.PI * 2);
+                confettiCtx.stroke();
+                confettiCtx.restore();
+            }
+            confettis = confettis.filter(p => now - p.birth < p.life && p.y < h + 100);
+            for (const p of confettis) {
+                p.vy += p.gravity * dt;
+                p.vx *= Math.pow(.985,dt * 60);
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.rotation += p.spin * dt;
+                const life = (now - p.birth) / p.life;
+                confettiCtx.save();
+                confettiCtx.globalAlpha = Math.min(1,(1 - life) * 3);
+                confettiCtx.translate(p.x,p.y);
+                confettiCtx.rotate(p.rotation);
+                confettiCtx.fillStyle = p.color;
+                if (p.kind === 'star') {
+                    victoryStarPath(confettiCtx,p.size);
+                    confettiCtx.shadowColor = p.color;
+                    confettiCtx.shadowBlur = 9;
+                    confettiCtx.fill();
+                } else if (p.kind === 'spark') {
+                    confettiCtx.beginPath();
+                    confettiCtx.moveTo(0,-p.size);
+                    confettiCtx.lineTo(p.size * .3,0);
+                    confettiCtx.lineTo(0,p.size);
+                    confettiCtx.lineTo(-p.size * .3,0);
+                    confettiCtx.closePath();
+                    confettiCtx.fill();
+                } else {
+                    const flip = .3 + Math.abs(Math.cos(life * 12)) * .7;
+                    confettiCtx.fillRect(-p.size * .35,-p.size * .7,p.size * .7 * flip,p.size * 1.4);
+                }
+                confettiCtx.restore();
+            }
+            if (age < 6500) confettiAnimationId = requestAnimationFrame(animateConfetti);
+            else stopConfetti();
+        }
+
+        function startConfetti({title = 'クリア！', subtitle = 'ぜんぶ つながった！'} = {}) {
+            stopConfetti();
+            victoryRunning = true;
+            victoryStartedAt = performance.now();
+            victoryPreviousFrame = victoryStartedAt;
+            victoryBurstIndex = 0;
+            document.getElementById('victoryTitle').textContent = title;
+            document.getElementById('victorySubtitle').textContent = subtitle;
+            victoryShow.classList.toggle('long-title',Array.from(title).length > 4);
+            // Commit the hidden state so a second finish restarts the CSS entrance.
+            void victoryShow.offsetWidth;
+            victoryShow.classList.remove('hidden');
+            document.body.classList.add('victory-active');
+            playVictoryFanfare();
+            const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+            if (!reducedMotion) animateConfetti(victoryStartedAt);
+            // All scheduled work belongs to this finish and is canceled on restart/exit.
+            scheduleVictoryTask(() => victoryShow.classList.add('hidden'),reducedMotion ? 1600 : 2700);
+            scheduleVictoryTask(stopConfetti,6600);
         }
 
         function stopConfetti() {
-            cancelAnimationFrame(confettiAnimationId);
-            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            victoryRunning = false;
+            if (confettiAnimationId !== null) cancelAnimationFrame(confettiAnimationId);
+            confettiAnimationId = null;
+            victoryTimers.forEach(clearTimeout);
+            victoryTimers = [];
+            victorySoundNodes.forEach(node => { try { node.stop(); } catch(e) { /* Already ended. */ } });
+            victorySoundNodes = [];
+            confettis = [];
+            victoryShow.classList.add('hidden');
+            document.body.classList.remove('victory-active');
+            confettiCtx.setTransform(1,0,0,1,0,0);
+            confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
         }
+
 
         // 初期起動
         window.onload = initSingleGame;
