@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ますあど</title>
     
     <!-- アプリアイコンの設定 -->
@@ -251,6 +251,107 @@
             #nextBtn { padding:10px 20px;font-size:17px; }
         }
 
+        /* Layout follows the supplied iPhone landscape mockup. */
+        body { padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-top:max(12px,env(safe-area-inset-top));padding-bottom:env(safe-area-inset-bottom); }
+        #arcadeHeader { display:grid;grid-template-columns:minmax(180px,1fr) auto minmax(94px,.6fr) minmax(100px,.8fr);align-items:center;gap:clamp(12px,2vw,28px);padding:0 3px 16px;flex-wrap:nowrap; }
+        #arcadeHeader h1 { grid-column:1;grid-row:1;gap:12px;min-width:0; }
+        .brand-mark { width:clamp(42px,4.5vw,62px);height:clamp(42px,4.5vw,62px);border-radius:19px;flex-shrink:0; }
+        .brand-mark svg { width:60%;height:60%; }
+        .brand-copy strong { font-size:clamp(24px,2.8vw,39px);letter-spacing:.06em; }
+        .brand-copy small { font-size:clamp(9px,1vw,13px);letter-spacing:.1em;white-space:nowrap; }
+        .mode-switch { grid-column:2;grid-row:1;justify-self:center;gap:5px;padding:5px!important;border-radius:20px!important; }
+        .mode-switch button { min-width:clamp(100px,10.2vw,150px);min-height:clamp(44px,4.9vw,65px);padding:9px 14px!important;font-size:clamp(14px,1.65vw,22px)!important;border-radius:16px!important;gap:8px; }
+        .mode-switch svg { display:block;width:clamp(18px,1.9vw,26px);height:clamp(18px,1.9vw,26px); }
+        #multiRankUI { grid-column:3;grid-row:1;justify-self:start;display:flex;align-items:baseline;gap:2px;border-radius:17px;min-height:clamp(48px,5.3vw,70px);padding:7px 14px;color:#302640;white-space:nowrap;line-height:1.2; }
+        #currentRankDisplay { font-size:clamp(31px,3.9vw,50px); }
+        .rank-suffix { font-size:clamp(16px,1.7vw,23px); }
+        .rank-total { font-size:clamp(12px,1.25vw,17px);padding-left:3px; }
+        #controlsUI,#multiStatusUI { grid-column:4;grid-row:1;width:auto;justify-self:end;justify-content:flex-end;gap:10px; }
+        #leaveRoomBtn { min-width:clamp(76px,8.4vw,120px);min-height:clamp(48px,5.3vw,70px);font-size:clamp(15px,1.6vw,21px);padding:10px 17px;border-radius:18px; }
+        body:not(.is-multiplayer) #arcadeHeader { grid-template-columns:minmax(180px,1fr) auto minmax(150px,1.4fr); }
+        body:not(.is-multiplayer) #controlsUI { grid-column:3; }
+        #gameOverlayUI { display:grid;grid-template-columns:minmax(140px,.95fr) minmax(120px,.85fr) minmax(200px,2.7fr);gap:clamp(14px,2vw,26px);align-items:center;min-height:79px;padding:5px 4px 16px;overflow:visible; }
+        .hud-timer { gap:13px;min-width:0; }
+        .hud-timer > svg { display:block;width:clamp(40px,4.5vw,58px);height:clamp(40px,4.5vw,58px);padding:10px;flex-shrink:0;border-radius:17px; }
+        .hud-timer .hud-label { display:block;font-size:clamp(10px,1.05vw,14px);letter-spacing:.08em; }
+        .timer-value { font-size:clamp(26px,3.45vw,46px);line-height:1.1;letter-spacing:.015em; }
+        .timer-value small { font-size:clamp(10px,1vw,14px); }
+        .hud-mission { min-width:0;width:100%;align-self:center;text-align:center; }
+        .mission-value { gap:9px;font-size:clamp(20px,2.6vw,34px);line-height:1.2; }
+        #reachedCount { font-size:clamp(32px,4.1vw,54px);line-height:1.15; }
+        #goalCount { font-size:clamp(25px,3vw,40px); }
+        .mission-value small { font-size:clamp(13px,1.5vw,20px); }
+        .mini-meter { height:6px;margin:9px 0 0; }
+        #multiplayerMarathon { grid-column:3;width:100%;max-width:none;min-width:0;height:clamp(36px,4.1vw,52px);padding:0 34px 0 24px;border:3px solid #8a80a4;overflow:visible; }
+        #multiplayerMarathon:not(.hidden) { display:flex!important; }
+        #marathonTrack { position:relative;width:100%;height:100%; }
+        .race-goal { position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:clamp(18px,2.1vw,28px);line-height:1; }
+        .marathon-runner { position:absolute;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;transition:left .35s ease;z-index:2; }
+        .runner-name { max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;line-height:1.15;font-weight:700;color:#55456f;background:#fff9f2;border-radius:999px;padding:1px 5px; }
+        .runner-avatar { width:30px;height:30px;display:grid;place-items:center;border:2px solid #fff;border-radius:50%;background:#bba9ea;color:#3d2d5b;font-size:14px;font-weight:700;box-shadow:0 2px 0 #28203b66; }
+        .marathon-runner.is-me { z-index:3; }
+        .is-me .runner-name { color:#e7802a;background:white; }
+        .is-me .runner-avatar { width:40px;height:40px;background:var(--mint);color:#254b45;border-width:3px;font-size:21px; }
+        .is-finished .runner-avatar { box-shadow:0 0 0 2px var(--yellow); }
+        body:not(.is-multiplayer) #gameOverlayUI { grid-template-columns:minmax(150px,1fr) minmax(130px,1fr); }
+        body:not(.is-multiplayer) .hud-mission { max-width:300px;justify-self:end; }
+        .cabinet-footer { height:58px;padding:7px 5px 0; }
+        .footer-instruction { font-size:clamp(12px,1.25vw,17px);white-space:nowrap; }
+        .footer-instruction b { font-size:1.15em; }
+        .footer-instruction svg { width:clamp(24px,2.5vw,34px);height:clamp(24px,2.5vw,34px); }
+        .footer-steps { position:absolute;left:50%;transform:translateX(-50%); }
+        @media (min-width:1100px) { body{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right));padding-top:max(18px,env(safe-area-inset-top))} }
+        @media (max-width:900px) {
+            #arcadeHeader { grid-template-columns:minmax(150px,1fr) auto minmax(80px,.5fr) minmax(78px,.6fr);gap:12px;padding-bottom:12px; }
+            .brand-mark { width:41px;height:41px;border-radius:14px; }.brand-copy strong{font-size:25px}.brand-copy small{font-size:9px}
+            .mode-switch{border-radius:16px!important}.mode-switch button{min-width:88px;min-height:42px;padding:8px 10px!important;font-size:13px!important;gap:6px;border-radius:12px!important}.mode-switch svg{width:17px;height:17px}
+            #multiRankUI{min-height:46px;padding:6px 10px;border-radius:14px}#currentRankDisplay{font-size:31px}.rank-suffix{font-size:17px}.rank-total{font-size:12px}
+            #leaveRoomBtn{min-width:76px;min-height:46px;padding:9px 12px;border-radius:14px;font-size:15px}
+            #gameOverlayUI{grid-template-columns:minmax(118px,.95fr) minmax(96px,.8fr) minmax(180px,2.4fr);gap:14px;min-height:68px;padding:6px 2px 13px}
+            .hud-timer{gap:8px}.hud-timer>svg{width:38px;height:38px;padding:8px;border-radius:13px}.timer-value{font-size:29px}.hud-timer .hud-label{font-size:10px}
+            #reachedCount{font-size:35px}#goalCount{font-size:27px}.mission-value{font-size:22px;gap:6px}.mission-value small{font-size:14px}.mini-meter{height:5px;margin-top:7px}
+            #multiplayerMarathon{height:36px;padding-right:29px;padding-left:20px;border-width:2px}.race-goal{font-size:21px;right:6px}.is-me .runner-avatar{width:34px;height:34px;font-size:18px}.runner-avatar{width:28px;height:28px;font-size:13px}.runner-name{font-size:9px}
+            .cabinet-footer{height:45px}.footer-instruction{font-size:12px}.footer-steps{gap:6px}.footer-steps span{width:25px;height:25px}
+            body:not(.is-multiplayer) #arcadeHeader{grid-template-columns:minmax(150px,1fr) auto minmax(130px,1fr)}
+        }
+        @media (max-width:600px) and (orientation:portrait) {
+            body{padding-top:max(12px,env(safe-area-inset-top))}
+            #arcadeHeader,body:not(.is-multiplayer) #arcadeHeader{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:11px 8px;padding:0 0 13px}
+            #arcadeHeader h1{grid-column:1;grid-row:1;gap:8px}.brand-mark{width:36px;height:36px;border-radius:12px}.brand-copy strong{font-size:23px}.brand-copy small{display:block;font-size:8px;margin-top:5px;letter-spacing:.03em}
+            .mode-switch{grid-column:2;grid-row:1;padding:4px!important;gap:3px;justify-self:end}.mode-switch button{min-width:72px;min-height:36px;padding:6px 9px!important;font-size:12px!important}.mode-switch svg{display:none}
+            #multiRankUI{grid-column:1;grid-row:2;min-height:38px;padding:4px 10px;border-radius:12px}#currentRankDisplay{font-size:27px}.rank-suffix{font-size:15px}.rank-total{font-size:12px}
+            #controlsUI,#multiStatusUI,body:not(.is-multiplayer) #controlsUI{grid-column:2;grid-row:2;justify-self:end;width:auto;gap:8px}#leaveRoomBtn{min-width:76px;min-height:38px;padding:6px 12px;border-radius:12px;font-size:13px}
+            #gameOverlayUI{grid-template-columns:minmax(118px,1fr) minmax(100px,1fr);gap:13px 18px;padding:0 1px 14px;min-height:0}
+            .hud-timer>svg{display:block;width:36px;height:36px;padding:8px}.timer-value{font-size:29px}.hud-timer .hud-label{font-size:9px}
+            .hud-mission{max-width:160px;justify-self:end}#reachedCount{font-size:33px}#goalCount{font-size:25px}.mission-value{font-size:20px}.mission-value small{font-size:13px}
+            #multiplayerMarathon{grid-column:1 / -1;grid-row:2;height:34px;margin-top:3px;padding-left:19px;padding-right:28px}.is-me .runner-avatar{width:32px;height:32px;font-size:17px}.runner-avatar{width:26px;height:26px;font-size:12px}.runner-name{font-size:9px}
+            .cabinet-footer{height:46px;justify-content:center}.footer-steps{display:none}.footer-instruction{font-size:11px}
+            body:not(.is-multiplayer) #gameOverlayUI{grid-template-columns:minmax(118px,1fr) minmax(100px,1fr)}
+        }
+        @media (max-width:350px) and (orientation:portrait) {
+            body{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}.brand-copy strong{font-size:21px}.brand-copy small{font-size:7px}.brand-mark{width:32px;height:32px}#arcadeHeader h1{gap:6px}.mode-switch button{min-width:64px;padding:6px 7px!important;font-size:11px!important}
+        }
+        @media (orientation:landscape) and (max-height:550px) {
+            body{padding-top:max(8px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+            #arcadeHeader{grid-template-columns:minmax(136px,1.1fr) auto minmax(78px,.6fr) minmax(72px,.8fr);gap:clamp(8px,1.8vw,18px);padding:0 2px 11px;min-height:0}
+            .brand-mark{width:36px;height:36px;border-radius:13px}.brand-copy strong{font-size:23px}.brand-copy small{display:block;font-size:8px;margin-top:4px}.mode-switch{padding:4px!important;gap:3px}.mode-switch button{min-width:78px;min-height:36px;font-size:12px!important;padding:6px 9px!important;gap:5px}.mode-switch svg{display:block;width:15px;height:15px}
+            #multiRankUI{min-height:40px;padding:5px 10px;border-radius:12px}#currentRankDisplay{font-size:29px}.rank-suffix{font-size:15px}.rank-total{font-size:11px}#leaveRoomBtn{min-width:72px;min-height:40px;font-size:13px;padding:7px 12px;border-radius:12px}
+            #controlsUI,#multiStatusUI{width:auto;gap:7px}#openSettingsBtn{width:35px;height:35px;padding:7px}#resetBtn{min-height:35px;padding:7px 10px;font-size:11px}
+            #gameOverlayUI{grid-template-columns:minmax(115px,.95fr) minmax(90px,.85fr) minmax(180px,2.7fr);gap:14px;min-height:56px;padding:4px 2px 12px}.hud-timer>svg{display:block;width:34px;height:34px;padding:7px;border-radius:12px}.hud-timer .hud-label{font-size:9px}.timer-value{font-size:28px}.timer-value small{font-size:9px}#reachedCount{font-size:32px}#goalCount{font-size:25px}.mission-value{font-size:21px}.mission-value small{font-size:12px}.mini-meter{margin-top:6px;height:4px}
+            #multiplayerMarathon{height:30px;padding-left:17px;padding-right:26px}.is-me .runner-avatar{width:30px;height:30px;font-size:16px}.runner-avatar{width:24px;height:24px;font-size:11px}.runner-name{font-size:8px;padding:1px 4px}.race-goal{font-size:18px}
+            .cabinet-footer{height:35px;padding:5px 3px 0;justify-content:space-between}.footer-instruction{font-size:11px}.footer-instruction svg{width:22px;height:22px}.footer-steps{display:flex;gap:6px}.footer-steps span{width:23px;height:23px;font-size:11px}
+            body:not(.is-multiplayer) #arcadeHeader{grid-template-columns:minmax(136px,1.1fr) auto minmax(124px,1.4fr)}
+        }
+        @media (prefers-reduced-motion:reduce) { .marathon-runner{transition:none} }
+        @media (orientation:landscape) and (max-height:550px) {
+            #arcadeHeader { padding-bottom:9px; }
+            #gameOverlayUI { min-height:50px;padding-top:2px;padding-bottom:8px; }
+        }
+        #multiRankUI,#leaveRoomBtn { min-height:clamp(48px,6.4vw,78px); }
+        @media (max-width:900px) { #leaveRoomBtn { min-height:54px; } }
+        @media (max-width:600px) and (orientation:portrait) { #multiRankUI,#leaveRoomBtn { min-height:44px; } }
+        @media (orientation:landscape) and (max-height:550px) { #multiRankUI,#leaveRoomBtn { min-height:49px; } }
+
     </style>
 </head>
 <!-- ★レイアウト崩れ対策: fixed inset-0 w-full h-full を指定し、画面のスクロール領域外へのはみ出しを完全に固定 -->
@@ -266,20 +367,16 @@
     </div>
 
     <!-- ヘッダー -->
-    <header id="arcadeHeader" class="bg-white shadow-md p-2 sm:p-4 z-20 relative flex flex-col sm:flex-row justify-between items-center gap-2">
-        <div class="flex items-center justify-between w-full sm:w-auto">
-            <h1>
+    <header id="arcadeHeader">
+        <h1>
                 <span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1z"/></svg></span>
                 <span class="brand-copy"><strong>ますあど</strong><small>すうじつなぎ アーケード</small></span>
             </h1>
-            
-            <!-- モード切替タブ (スマホでは右寄せ、PCではタイトル横) -->
-            <div class="mode-switch flex bg-blue-100 rounded-full p-1 ml-4 shadow-inner" role="group" aria-label="あそびかた">
+        <div class="mode-switch flex bg-blue-100 rounded-full p-1 ml-4 shadow-inner" role="group" aria-label="あそびかた">
                 <button id="modeSingleBtn" aria-pressed="true" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full bg-white text-blue-600 shadow transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>ひとりで</button>
                 <button id="modeMultiBtn" aria-pressed="false" class="px-3 sm:px-4 py-1 text-sm sm:text-base font-bold rounded-full text-blue-500 hover:text-blue-600 transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="7" r="3.5"/><path d="M2 21v-3a7 7 0 0 1 14 0v3M17 4a3.5 3.5 0 0 1 0 7m2 3a6 6 0 0 1 3 5v2"/></svg>だれかと</button>
             </div>
-        </div>
-
+        <div id="multiRankUI" class="hidden" aria-label="じゅんい"><strong id="currentRankDisplay">1</strong><span class="rank-suffix">位</span><span class="rank-total"> / <span id="totalPlayersDisplay">1</span>人</span></div>
         <div id="controlsUI" class="flex items-center gap-3 sm:gap-6 w-full sm:w-auto justify-center sm:justify-end">
             <!-- 歯車の設定ボタン -->
             <button id="openSettingsBtn" aria-label="せってい" title="せってい" class="text-slate-500 hover:text-slate-700 transition-transform transform active:scale-95 bg-slate-100 p-2.5 rounded-full shadow-sm">
@@ -289,26 +386,15 @@
                 やりなおす
             </button>
         </div>
-        
-        <!-- だれかとモード用の簡易ステータス（ヘッダー右端） -->
-        <div id="multiStatusUI" class="hidden items-center gap-4 w-full sm:w-auto justify-center sm:justify-end">
-            <div class="font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full text-sm flex gap-2">
-                へや: <span id="currentRoomDisplay" class="text-blue-600">---</span>
-            </div>
-            <button id="leaveRoomBtn" class="bg-slate-400 hover:bg-slate-500 text-white font-bold py-1.5 px-3 rounded-full shadow-sm text-sm transition-transform active:scale-95">
+        <div id="multiStatusUI" class="hidden"><button id="leaveRoomBtn" class="bg-slate-400 hover:bg-slate-500 text-white font-bold py-1.5 px-3 rounded-full shadow-sm text-sm transition-transform active:scale-95">
                 やめる
-            </button>
-        </div>
+            </button></div>
     </header>
 
     <div id="gameOverlayUI" aria-label="ゲームのじょうほう">
         <div class="hud-timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v5l3 2M9 2h6M12 2v3M18 5l2 2"/></svg><div><span class="hud-label">タイム</span><div class="timer-value"><span id="timerDisplay">0.00</span><small>秒</small></div></div></div>
-        <div class="hud-mission"><span class="hud-label">つないだ かず</span><div class="mission-value"><strong id="reachedCount">0</strong><span>/</span><span id="goalCount">10</span><small>こ</small></div><div class="mini-meter" aria-hidden="true"><span id="hudProgress"></span></div></div>
-        <div class="hud-race">
-            <div id="soloBadge" class="solo-badge"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1z"/></svg><div><span>こんかいの すうじ</span><strong id="rangeLabel">1〜10</strong></div></div>
-            <div id="multiRankUI" class="hidden"><span id="currentRankDisplay">1</span>位<span class="text-xs"> / <span id="totalPlayersDisplay">1</span>人</span></div>
-            <div id="multiplayerMarathon" class="hidden relative rounded-full flex items-center"><div class="absolute right-1 text-lg" aria-hidden="true">🏁</div><div id="marathonTrack" class="relative w-full h-full"></div></div>
-        </div>
+        <div class="hud-mission" aria-label="つないだ かず"><div class="mission-value"><strong id="reachedCount">0</strong><span>/</span><span id="goalCount">10</span><small>こ</small></div><div class="mini-meter" aria-hidden="true"><span id="hudProgress"></span></div></div>
+        <div id="multiplayerMarathon" class="hidden relative rounded-full" aria-label="みんなの すすみぐあい"><div class="race-goal" aria-hidden="true">🏁</div><div id="marathonTrack"></div></div>
     </div>
 
     <!-- ゲーム画面領域 -->
@@ -340,7 +426,6 @@
     <footer class="cabinet-footer">
         <div class="footer-instruction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V6a2 2 0 0 1 4 0v6-2a2 2 0 0 1 4 0v2-1a2 2 0 0 1 4 0v5c0 4-2 6-6 6h-2c-3 0-4-2-6-5l-2-3a2 2 0 0 1 3-2l1 1Z"/><path d="M4 4 3 3m12 0 1-1M9 1V0"/></svg><span><b>1</b> から じゅんばんに つなごう！</span></div>
         <div class="footer-steps" aria-hidden="true"><span>1</span>→<span>2</span>→<span>3</span>…<span>★</span></div>
-        <div class="cabinet-signature" aria-hidden="true"><i></i> MASUADO NUMBER CLUB</div>
     </footer>
 
     <!-- マルチプレイ用 モーダル群 (キャンバス上に被せる) -->
@@ -1094,14 +1179,13 @@
             const isMulti = gameMode === 'multi';
             modeSingleBtn.setAttribute('aria-pressed', String(!isMulti));
             modeMultiBtn.setAttribute('aria-pressed', String(isMulti));
-            document.getElementById('soloBadge').classList.toggle('hidden', isMulti);
+            document.body.classList.toggle('is-multiplayer', isMulti);
         }
 
         function updateArcadeProgress() {
             const reached = Math.min(balls.length, Math.max(0, targetNumber - 1));
             document.getElementById('reachedCount').textContent = reached;
             document.getElementById('goalCount').textContent = balls.length;
-            document.getElementById('rangeLabel').textContent = `1〜${balls.length}`;
             document.getElementById('hudProgress').style.width = (balls.length ? reached / balls.length * 100 : 0) + '%';
             canvas.setAttribute('aria-label', `1から${balls.length}までの数字をつなぐ盤面。${reached}こ つながったよ`);
         }
@@ -1475,7 +1559,6 @@
                     transaction.update(roomRef, updates);
                 });
                 currentRoomId = roomId;
-                document.getElementById('currentRoomDisplay').textContent = roomId;
                 document.getElementById('waitingRoomWord').textContent = roomId;
                 showMultiSettingsError();
                 showModal('roomWaitingUI');
@@ -1626,39 +1709,35 @@
             document.getElementById('currentRankDisplay').innerText = myRank;
             document.getElementById('totalPlayersDisplay').innerText = totalPlayers;
 
-            // --- 2. マラソンバーの更新 ---
+            // 同じアイコンを保ち、進捗の更新時は位置だけを動かす。
             const track = document.getElementById('marathonTrack');
-            track.innerHTML = '';
-            
-            Object.keys(players).forEach(uid => {
-                const p = players[uid];
-                const percent = Math.min(100, (p.progress / totalBalls) * 100);
-                const isMe = uid === currentUserId;
-                const initial = p.name ? p.name.charAt(0) : '?';
-                
-                const icon = document.createElement('div');
-                // アイコンを % の位置に絶対配置
-                icon.className = `absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center justify-center transition-all duration-300 ease-out ${isMe ? 'z-20' : 'z-10'}`;
-                icon.style.left = `${percent}%`;
-
-                if (isMe) {
-                    // 自分のアイコンはオレンジ色で少し大きく表示
-                    icon.innerHTML = `
-                        <div class="text-[8px] sm:text-[10px] font-bold text-orange-600 leading-none mb-0.5 bg-white/90 px-1 rounded-full drop-shadow-sm">あなた</div>
-                        <div class="w-6 h-6 sm:w-8 sm:h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                            ${initial}
-                        </div>
-                    `;
-                } else {
-                    // 他の人のアイコンは青色で小さめに表示
-                    icon.innerHTML = `
-                        <div class="text-[7px] sm:text-[9px] font-bold text-slate-500 leading-none mb-0.5 bg-white/90 px-1 rounded-full truncate max-w-[40px] drop-shadow-sm">${p.name}</div>
-                        <div class="w-4 h-4 sm:w-6 sm:h-6 bg-blue-400 rounded-full border sm:border-2 border-white shadow flex items-center justify-center text-white font-bold text-[8px] sm:text-xs">
-                            ${initial}
-                        </div>
-                    `;
+            const icons = new Map(Array.from(track.children).map(icon => [icon.dataset.playerId, icon]));
+            const count = Math.max(1, Number(totalBalls) || 1);
+            Object.entries(players).forEach(([uid, player]) => {
+                let icon = icons.get(uid);
+                if (!icon) {
+                    icon = document.createElement('div');
+                    icon.dataset.playerId = uid;
+                    icon.className = 'marathon-runner';
+                    const label = document.createElement('span');
+                    label.className = 'runner-name';
+                    const avatar = document.createElement('span');
+                    avatar.className = 'runner-avatar';
+                    icon.append(label, avatar);
+                    track.appendChild(icon);
                 }
-                track.appendChild(icon);
+                const isMe = uid === currentUserId;
+                const progress = Math.max(0, Number(player.progress) || 0);
+                icon.style.left = Math.min(100, progress / count * 100) + '%';
+                icon.classList.toggle('is-me', isMe);
+                icon.classList.toggle('is-finished', player.time !== null);
+                icon.children[0].textContent = isMe ? 'あなた' : player.name;
+                icon.children[1].textContent = Array.from(player.name || '？')[0];
+                icon.setAttribute('role', 'img');
+                icon.setAttribute('aria-label', `${player.name}、${Math.min(count, progress)}こ / ${count}こ`);
+            });
+            icons.forEach((icon, uid) => {
+                if (!Object.prototype.hasOwnProperty.call(players, uid)) icon.remove();
             });
         }
 
